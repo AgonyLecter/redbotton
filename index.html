@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com https://*.firebasedatabase.app https://*.firebaseio.com https://www.google.com https://www.recaptcha.net; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; frame-src https://www.google.com https://www.recaptcha.net https://*.firebaseapp.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Test di Accettazione</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;outline:none}
@@ -45,12 +47,36 @@ body.hz #tag:before{background:#e33}
 .big{font:inherit;font-size:1.05rem;padding:12px 28px;border:2px solid currentColor;background:none;color:inherit;border-radius:8px;cursor:pointer}
 #end{display:none;background:#000;color:#9fd;font:14px/1.9 ui-monospace,monospace;z-index:40}
 #ebtn{opacity:0;transition:opacity 1s;color:inherit;font-family:inherit}
+#coach{position:fixed;left:50%;top:calc(34px + env(safe-area-inset-top));transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:9px 16px 9px 10px;border-radius:30px;background:rgba(0,0,0,.66);border:1px solid rgba(255,255,255,.25);color:#fff;font:600 12px/1.35 system-ui,sans-serif;letter-spacing:.08em;z-index:22;opacity:0;transition:opacity .4s;pointer-events:none;width:max-content;max-width:calc(100vw - 24px)}
+#coach.on{opacity:1;animation:cpul 2.2s infinite}@keyframes cpul{50%{box-shadow:0 0 0 4px rgba(255,255,255,.12)}}
+#cico{position:relative;width:48px;height:30px;flex:none}
+#cico i,#cico b{position:absolute;top:50%;left:50%;border-radius:50%}
+#cico i{width:14px;height:14px;margin:-7px;background:#fff;box-shadow:0 0 10px #fff}
+#cico b{width:30px;height:30px;margin:-15px;border:2px solid #fff;opacity:0}
+.drag #cico i{animation:cdrag 1.6s ease-in-out infinite}@keyframes cdrag{0%,100%{transform:translate(-17px,4px)}50%{transform:translate(17px,-4px)}}
+.tap #cico i{animation:ctap 1.1s infinite}@keyframes ctap{20%{transform:scale(.6)}40%{transform:scale(1)}}
+.tap #cico b{animation:cring 1.1s infinite}@keyframes cring{20%{opacity:.9;transform:scale(.4)}100%{opacity:0;transform:scale(1.3)}}
+.hold #cico b{animation:chold 1.4s linear infinite}@keyframes chold{0%{opacity:.9;transform:scale(1.2)}100%{opacity:0;transform:scale(.3)}}
+.still #cico i{background:none;box-shadow:none;border:2px solid #fff;animation:none}.still #cico b{opacity:.9;width:2px;height:24px;margin:-12px -1px;border:0;border-radius:0;background:#fff;transform:rotate(45deg)}
+#cbar{display:block;height:3px;margin-top:5px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden}#cbar:empty{display:none}#cbar u{display:block;height:100%;background:#fff;transition:width .15s}
+#breath{position:fixed;left:50%;top:44%;width:160px;height:160px;margin:-80px;border-radius:50%;border:2px solid rgba(255,255,255,.7);box-shadow:0 0 40px rgba(255,255,255,.25) inset;opacity:0;pointer-events:none;z-index:17;transition:opacity .6s,transform 1.6s ease-in-out;transform:scale(.45)}
+#js{position:fixed;inset:0;z-index:60;pointer-events:none;display:none;align-items:center;justify-content:center;background:#f2f2f5;overflow:hidden}
+#js svg{width:min(120vw,120vh);height:min(120vw,120vh);animation:jz .32s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes jz{from{transform:scale(.15) rotate(-6deg)}to{transform:scale(1.25) rotate(2deg)}}
+#js.on{display:flex;animation:jsh .06s infinite,jbg .5s steps(1) infinite}@keyframes jsh{50%{transform:translate(9px,-7px)}}@keyframes jbg{0%{background:#f2f2f5}25%{background:#b00}50%{background:#fff}75%{background:#300}}
+#js:after{content:"";position:absolute;inset:0;background:#c00;mix-blend-mode:multiply;opacity:0;animation:jr .12s 3 .3s}@keyframes jr{50%{opacity:.85}}
 </style>
 </head>
 <body>
 <div id="room"></div>
 <div id="veil"></div>
 <canvas id="fx"></canvas><div id="cue"></div><div id="rec"></div><div id="hud"></div><div id="card"></div>
+<div id="coach"><div id="cico"><i></i><b></b></div><div><span id="ctxt"></span><span id="cbar"></span></div></div><div id="breath"></div>
+<div id="js"><svg viewBox="0 0 400 400" aria-hidden="true"><defs><radialGradient id="jh" cx="50%" cy="38%" r="60%"><stop offset="0" stop-color="#16161a"/><stop offset=".6" stop-color="#060607"/><stop offset="1" stop-color="#000"/></radialGradient><filter id="jb"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
+<path d="M40 400 C60 300 120 270 200 268 C280 270 340 300 360 400Z" fill="#020203"/>
+<ellipse cx="200" cy="165" rx="92" ry="130" fill="url(#jh)" stroke="#000" stroke-width="3" filter="url(#jb)"/>
+<ellipse cx="200" cy="150" rx="55" ry="70" fill="#000" opacity=".55" filter="url(#jb)"/>
+<g stroke="#050506" stroke-width="9" stroke-linecap="round" fill="none"><path d="M18 400 L60 250 L40 120 M60 250 L20 140 M60 250 L72 118 M60 250 L95 135"/><path d="M382 400 L340 250 L360 120 M340 250 L380 140 M340 250 L328 118 M340 250 L305 135"/></g></svg></div>
 <div id="dlg"><div id="tag">NARRATORE</div><div id="txt"></div></div>
 <div class="ov" id="start">
   <div id="mt"><small>UN TEST DI OBBEDIENZA</small><h1>IL BOTTONE<br>ROSSO</h1></div>
@@ -65,6 +91,8 @@ if(!THREE){document.getElementById('mq').textContent='Impossibile caricare il mo
 const FB={apiKey:"AIzaSyAkUVXKvb98udD0cy_Cllay3VECK-AoRtc",authDomain:"wandernaturelogin.firebaseapp.com",
 databaseURL:"https://wandernaturelogin-default-rtdb.europe-west1.firebasedatabase.app",projectId:"wandernaturelogin",
 storageBucket:"wandernaturelogin.firebasestorage.app",messagingSenderId:"347933923936",appId:"1:347933923936:web:cc34ca02d7247970ff8105"};
+/* Chiave reCAPTCHA v3 per Firebase App Check (facoltativa ma consigliata: vedi SICUREZZA.md). Vuota = App Check spento. */
+const APPCHECK_KEY="";
 
 const $=i=>document.getElementById(i),room=$('room'),txt=$('txt'),dlg=$('dlg'),tag=$('tag'),veil=$('veil');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),rnd=(a,b)=>a+Math.random()*(b-a);
@@ -73,17 +101,34 @@ const uid=localStorage.sp_uid||(localStorage.sp_uid=Math.random().toString(36).s
 let muted=false,rebel=0,db=null,fb={},mode='off',bts=[],c={dodge:0,tele:0,split:0,all:0},tok=0,lastR=0,hint='',tester='0000',t0=0,pressed=false,who='Tester',ans={},tg=null,ghN=0,sw=0,batt=null,kick=0;try{navigator.getBattery&&navigator.getBattery().then(b=>batt=b)}catch(e){}
 const pad=n=>String(n).padStart(2,'0'),clk=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())},UA=navigator.userAgent,
 DV=/iPhone/.test(UA)?'iPhone':/iPad/.test(UA)?'iPad':/Android/.test(UA)?'telefono Android':/Windows/.test(UA)?'computer Windows':/Mac/.test(UA)?'Mac':'dispositivo che non riconosco',
-vis=+localStorage.sp_v||0,vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};localStorage.sp_v=vis+1;const last=+localStorage.sp_last||0;localStorage.sp_last=Date.now();const ago=()=>{const m=(Date.now()-last)/6e4;return m<60?Math.max(1,Math.round(m))+' minuti':m<1440?Math.round(m/60)+' ore':Math.round(m/1440)+' giorni'};
+vis=Math.max(0,parseInt(localStorage.sp_v)||0),vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};localStorage.sp_v=vis+1;
+/* ultima visita: salvata come millisecondi, aggiornata mentre giochi e quando esci; valori assurdi vengono scartati */
+const NOW0=Date.now(),L0=parseInt(localStorage.sp_last,10),last=Number.isFinite(L0)&&L0>1.5e12&&L0<=NOW0+6e4&&NOW0-L0<3.2e10?Math.min(L0,NOW0):0;
+const stamp=()=>{try{localStorage.sp_last=String(Date.now())}catch(e){}};stamp();setInterval(stamp,15000);addEventListener('pagehide',stamp);
+const ago=()=>{if(!last)return '';const s=Math.max(0,(NOW0-last)/1000),m=s/60;const u=(x,a,b)=>x+' '+(x===1?a:b);
+  return s<60?'pochi secondi':m<60?u(Math.max(1,Math.round(m)),'minuto','minuti'):m<1440?u(Math.round(m/60),'ora','ore'):u(Math.round(m/1440),'giorno','giorni')};
+const esc=x=>String(x).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const P={d:0,taps:0,mx:innerWidth/2,my:innerHeight/2,last:Date.now(),empty:0,clicks:[],blurAt:0},buf=[];
 const setTag=s=>tag.textContent=s;
+/* ===== Coach: istruzioni sempre visibili, con gesto animato ===== */
+const coachEl=$('coach'),ctxt=$('ctxt'),cbar=$('cbar');
+function coach(kind,t,prog){if(!kind){coachEl.classList.remove('on');return}coachEl.className='on '+kind;ctxt.textContent=t;
+  cbar.innerHTML=prog==null?'':'<u style="width:'+Math.round(Math.max(0,Math.min(1,prog))*100)+'%"></u>'}
+const coachP=p=>{const u=cbar.firstChild;if(u)u.style.width=Math.round(Math.max(0,Math.min(1,p))*100)+'%'};
+const TAP=()=>T?'TOCCA':'CLICCA',DRAG=()=>T?'TRASCINA IL DITO SULLO SCHERMO':'MUOVI IL MOUSE';
 
 /* ===== Firebase ===== */
-async function initFB(){try{const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-  fb=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');db=fb.getDatabase(A.initializeApp(FB))}catch(e){db=null}}
-const save=o=>db&&fb.update(fb.ref(db,'stanza/giocatori/'+uid),{...o,t:Date.now()}).catch(()=>{});
-function presence(){if(!db)return;const r=fb.ref(db,'stanza/cursori/'+uid);fb.onDisconnect(r).remove();let last=0;
-  addEventListener('pointermove',e=>{const n=Date.now();if(n-last<250)return;last=n;fb.set(r,{x:e.clientX/innerWidth,y:e.clientY/innerHeight,t:n}).catch(()=>{})})}
-const attempt=()=>{if(db){fb.runTransaction(fb.ref(db,'stanza/globale/tentativi'),x=>(x||0)+1).catch(()=>{});save({cap:1,tentativi:c.all})}};
+/* Login anonimo: ogni giocatore scrive SOLO nel proprio ramo (le regole del database lo impongono, vedi database.rules.json) */
+let auid=null;
+async function initFB(){try{const V='https://www.gstatic.com/firebasejs/10.12.2/',A=await import(V+'firebase-app.js'),app=A.initializeApp(FB);
+  if(APPCHECK_KEY){try{const C=await import(V+'firebase-app-check.js');C.initializeAppCheck(app,{provider:new C.ReCaptchaV3Provider(APPCHECK_KEY),isTokenAutoRefreshEnabled:true})}catch(e){}}
+  fb=await import(V+'firebase-database.js');db=fb.getDatabase(app);
+  try{const Au=await import(V+'firebase-auth.js');const cr=await Promise.race([Au.signInAnonymously(Au.getAuth(app)),sleep(6000).then(()=>null)]);auid=cr&&cr.user&&cr.user.uid}catch(e){auid=null}
+  if(!auid)db=null}catch(e){db=null}}
+const save=o=>db&&auid&&fb.update(fb.ref(db,'stanza/giocatori/'+auid),{...o,t:Date.now()}).catch(()=>{});
+function presence(){if(!db||!auid)return;const r=fb.ref(db,'stanza/cursori/'+auid);fb.onDisconnect(r).remove();let last=0;
+  addEventListener('pointermove',e=>{const n=Date.now();if(n-last<250)return;last=n;fb.set(r,{x:Math.max(0,Math.min(1,e.clientX/innerWidth)),y:Math.max(0,Math.min(1,e.clientY/innerHeight)),t:n}).catch(()=>{})})}
+const attempt=()=>{if(db){fb.runTransaction(fb.ref(db,'stanza/globale/tentativi'),x=>(x||0)+1).catch(()=>{});save({cap:1,tentativi:Math.min(99999,c.all)})}};
 
 /* ===== Audio (sintetizzato) ===== */
 let ac,mg,hO,hG,hb=0;
@@ -109,8 +154,8 @@ const say=async(...a)=>{busy++;try{return await say0(...a)}finally{busy--;lastSa
 const guide=(l,ok,tg)=>{G={l,ok,tg,i:0,s:Date.now(),f:0}};
 const BT=()=>bts[0]?[bts[0]._x,bts[0]._y]:null;
 const until=(f,h,tg)=>new Promise(r=>{if(h)guide(h,()=>!f(),tg);const i=setInterval(()=>{if(f()){clearInterval(i);r()}},100)});
-function choose(opts){return new Promise(r=>{const d=document.createElement('div');d.id='ch';
-  opts.forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;b.onclick=()=>{S.ok();d.remove();dlg.style.pointerEvents='';r(i)};d.append(b)});
+function choose(opts){return new Promise(r=>{const d=document.createElement('div');d.id='ch';const t1=Date.now();
+  opts.forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;b.onclick=()=>{S.ok();ans.rt=Date.now()-t1;d.remove();dlg.style.pointerEvents='';r(i)};d.append(b)});
   dlg.append(d);dlg.style.pointerEvents='auto'})}
 function askName(){return new Promise(r=>{const d=document.createElement('div');d.id='ch';d.innerHTML='<input id="nm" maxlength="14" placeholder="Scrivi il tuo nome" autocomplete="off"><button class="opt">Conferma</button>';
   dlg.append(d);dlg.style.pointerEvents='auto';const go=()=>{const x=$('nm').value.trim()||'Tester';d.remove();dlg.style.pointerEvents='';r(x)};
@@ -135,7 +180,7 @@ const rdr=new THREE.WebGLRenderer({antialias:!T,powerPreference:'high-performanc
 rdr.setPixelRatio(Math.min(devicePixelRatio||1,T?1.6:2));rdr.outputColorSpace=THREE.SRGBColorSpace;room.append(rdr.domElement);
 const FOGC=new THREE.Color(0xe4e4ea),DARKC=new THREE.Color(0x040406);
 const scene=new THREE.Scene();scene.background=FOGC.clone();scene.fog=new THREE.FogExp2(FOGC.clone(),.03);
-const cam=new THREE.PerspectiveCamera(60,1,.1,70);let baseFov=60;
+const cam=new THREE.PerspectiveCamera(60,1,.1,70);let baseFov=60,camZ=CZ,camZT=CZ;
 const resize=()=>{rdr.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;baseFov=innerWidth<innerHeight?74:58;cam.fov=baseFov;cam.updateProjectionMatrix()};
 addEventListener('resize',resize);resize();
 
@@ -221,7 +266,7 @@ const M_blob=new THREE.MeshBasicMaterial({map:radT('rgba(0,0,0,.6)','rgba(0,0,0,
 const M_glow=new THREE.MeshBasicMaterial({map:radT('rgba(255,40,40,.9)','rgba(255,0,0,0)'),transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false});
 const G_base=new THREE.CylinderGeometry(.5,.56,.14,32),G_col=new THREE.CylinderGeometry(.44,.46,.1,32),G_cap=new THREE.CylinderGeometry(.34,.38,.22,32),G_dome=new THREE.SphereGeometry(.34,28,10,0,Math.PI*2,0,Math.PI/2),G_pl=new THREE.PlaneGeometry(1,1);
 function sync(b){const p=b.g.position,q=proj(p.x,PY,p.z);b._x=q[0];b._y=q[1];const d=Math.hypot(cam.position.x-p.x,cam.position.z-p.z);b._r=.5*(innerHeight/2)/(Math.tan(cam.fov*rad/2)*Math.max(.5,d))}
-function place(b,x,y,snap){const p=floorAt(x,y,PY);b.wx=Math.max(-3.4,Math.min(3.4,p.x));b.wz=Math.max(-8.5,Math.min(4,p.z));if(snap){b.g.position.set(b.wx,0,b.wz)}sync(b)}
+function place(b,x,y,snap){const p=floorAt(x,y,PY);b.wx=Math.max(-3.4,Math.min(3.4,p.x));b.wz=Math.max(-8.5,Math.min(Math.min(4,camZT-1.4),p.z));if(snap){b.g.position.set(b.wx,0,b.wz)}sync(b)}
 function mk(x,y){const g=new THREE.Group(),i=new THREE.Group();g.add(i);
   const sh=new THREE.Mesh(G_pl,M_blob);sh.scale.set(1.9,1.9,1);sh.rotation.x=-Math.PI/2;sh.position.y=.01;g.add(sh);
   const gl=new THREE.Mesh(G_pl,M_glow);gl.scale.set(3.6,3.6,1);gl.rotation.x=-Math.PI/2;gl.position.y=.03;gl.visible=false;g.add(gl);
@@ -247,26 +292,31 @@ function hit(b){
   setTimeout(()=>{if(mode!==k)return;if(k==='split'&&bts.length<8){const q=mk(b._x,b._y);setTimeout(()=>place(q,...rndPos()),30)}place(b,...rndPos());S.whoosh()},350);
   react(k)}
 
-/* ===== Ospite 3D ===== */
+/* ===== Ospite 3D: figura nera, altissima, senza volto ===== */
 const figG=new THREE.Group();figG.visible=false;scene.add(figG);
-const dm=new THREE.MeshLambertMaterial({color:0x0a0a0f}),om=new THREE.MeshBasicMaterial({color:0x3a3a48,side:THREE.BackSide,fog:true});
-function part(geo,x,y,z,sx,sy,sz,rz,par){const m=new THREE.Mesh(geo,dm);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.rotation.z=rz||0;(par||figG).add(m);const o=new THREE.Mesh(geo,om);o.scale.setScalar(1.07);m.add(o);return m}
+const dm=new THREE.MeshLambertMaterial({color:0x040405}),om=new THREE.MeshBasicMaterial({color:0x23232c,side:THREE.BackSide,fog:true});
+function part(geo,x,y,z,sx,sy,sz,rz,par,rx){const m=new THREE.Mesh(geo,dm);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.rotation.z=rz||0;m.rotation.x=rx||0;(par||figG).add(m);const o=new THREE.Mesh(geo,om);o.scale.setScalar(1.05);m.add(o);return m}
 const cy=(r1,r2,h,s)=>new THREE.CylinderGeometry(r1,r2,h,s||12);
-part(cy(.055,.05,.9),-.09,.45,0,1,1,1);part(cy(.055,.05,.9),.09,.45,0,1,1,1);
-part(cy(.2,.13,.78,14),0,1.25,0,1,1,.6);
-part(cy(.03,.025,1.05,8),-.27,1.08,0,1,1,1,.05);part(cy(.03,.025,1.05,8),.27,1.08,0,1,1,1,-.05);
-[-1,1].forEach(s=>{for(let i=0;i<3;i++)part(cy(.008,.006,.17,5),s*.285+(i-1)*.02,.46,0,1,1,1,0)});
-part(cy(.04,.04,.14,8),0,1.67,0,1,1,1);
-const headG=new THREE.Group();headG.position.y=1.72;figG.add(headG);
-part(new THREE.SphereGeometry(.11,16,14),0,.13,0,.9,1.35,.9,0,headG);
-const eyeM=new THREE.MeshBasicMaterial({color:0xe8fff4,fog:false}),eyeG=new THREE.SphereGeometry(.02,8,8),eyes=[];
-[-.04,.04].forEach(x=>{const e=new THREE.Mesh(eyeG,eyeM);e.position.set(x,.15,.095);e.visible=false;headG.add(e);eyes.push(e)});
-const figShadow=new THREE.Mesh(G_pl,M_blob);figShadow.scale.set(.9,.9,1);figShadow.rotation.x=-Math.PI/2;figShadow.position.y=.012;figG.add(figShadow);
-let figNear=false;
-function showFig(x,k){if(x==null){figG.visible=false;return}
-  const dist=k<=.85?14.5:Math.max(3.4,14.5-(k-.8)*8),z=CZ-dist;let wx;
-  if(k<=.85)wx=DOORX;else{const hw=dist*Math.tan(cam.fov*rad/2)*cam.aspect;wx=(x/100-.5)*2*hw}
-  figG.position.set(Math.max(-3.4,Math.min(3.4,wx)),0,z);figG.scale.setScalar(1.35);figNear=k>=1.5;eyes.forEach(e=>e.visible=figNear);figG.visible=true}
+/* corpo: un telo lungo e stretto che arriva a terra, con l'orlo irregolare */
+const robeP=[[0,0],[.3,.0],[.27,.06],[.24,.45],[.2,.95],[.17,1.3],[.21,1.5],[.19,1.6],[.08,1.68],[0,1.7]].map(([r,y])=>new THREE.Vector2(r,y));
+const robeG=new THREE.LatheGeometry(robeP,18);{const pa=robeG.attributes.position;for(let i=0;i<pa.count;i++)if(pa.getY(i)<.08){pa.setX(i,pa.getX(i)*(1+Math.random()*.25));pa.setZ(i,pa.getZ(i)*(1+Math.random()*.25))}robeG.computeVertexNormals()}
+const body=part(robeG,0,0,0,1,1,.7);
+/* braccia troppo lunghe: arrivano sotto le ginocchia, dita sottili */
+const arms=[-1,1].map(s=>{const sh=new THREE.Group();sh.position.set(s*.2,1.55,0);figG.add(sh);
+  part(cy(.035,.028,.75,8),0,-.37,0,1,1,1,0,sh);const fo=new THREE.Group();fo.position.y=-.74;sh.add(fo);
+  part(cy(.028,.02,.7,8),0,-.35,0,1,1,1,0,fo);for(let i=0;i<4;i++)part(cy(.007,.003,.24,5),(i-1.5)*.014,-.8,.01*(i%2),1,1,1,(i-1.5)*.06,fo);
+  sh.rotation.z=s*.07;return{sh,fo,s}});
+part(cy(.035,.045,.22,8),0,1.76,0,1,1,1);
+const headG=new THREE.Group();headG.position.y=1.86;figG.add(headG);
+/* testa liscia, allungata, nessun tratto del viso */
+part(new THREE.SphereGeometry(.12,20,16),0,.15,.01,.92,1.55,.95,0,headG);
+const figShadow=new THREE.Mesh(G_pl,M_blob);figShadow.scale.set(1.1,1.1,1);figShadow.rotation.x=-Math.PI/2;figShadow.position.y=.012;figG.add(figShadow);
+let figNear=false,figK=0;
+/* x: posizione orizzontale (0..100 % dello schermo), k: vicinanza (<=.85 = sulla porta in fondo, 3 = davanti a te) */
+function showFig(x,k){if(x==null){figG.visible=false;figK=0;return}
+  const D0=camZ-(ZF+1),dist=k<=.85?D0:Math.max(1.6,D0-(k-.8)*D0*.42),z=camZ-dist;let wx;
+  if(k<=.85)wx=DOORX;else{const hw=dist*Math.tan(cam.fov*rad/2)*cam.aspect;wx=(x/100-.5)*2*hw*Math.min(1,dist/6)}
+  figG.position.set(Math.max(-3.4,Math.min(3.4,wx)),0,z);figG.scale.setScalar(1.3);figNear=k>=1.5;figK=k;figG.visible=true}
 
 /* ===== Porte 3D (capitolo 2) ===== */
 const DR=[];let dpk=null;
@@ -328,7 +378,8 @@ function frame3(n){try{
   const hz=document.body.classList.contains('hz');FZ+=((hz?1:0)-FZ)*.03;
   /* camera: sguardo che segue il dito + respiro + tremito della paura */
   const nx=P.mx/innerWidth-.5,ny=P.my/innerHeight-.5;cyaw+=((-nx*.24)-cyaw)*.04;cpit+=((-ny*.09)-cpit)*.04;kick*=.9;
-  cam.position.set(Math.sin(n/2600)*.03+(hz?(Math.random()-.5)*.004*fear:0),EY+Math.sin(n/1100)*.012-kick*.04,CZ);
+  const wk=camZ-camZT;camZ+=(camZT-camZ)*.05;
+  cam.position.set(Math.sin(n/2600)*.03+(hz?(Math.random()-.5)*.004*fear:0)+Math.sin(n/160)*.02*Math.min(1,wk),EY+Math.sin(n/1100)*.012-kick*.04-Math.abs(Math.sin(n/160))*.035*Math.min(1,wk),camZ);
   cam.rotation.set(-.11+cpit+Math.sin(n/1900)*.012+kick*Math.sin(n/38)*.025,cyaw,hz?Math.sin(n/1300)*.012*fear*2.5+kick*.02:0,'YXZ');
   cam.fov=baseFov+Math.sin(n/1700)*.4*(1+fear*2.5)-kick*3;cam.updateProjectionMatrix();cam.updateMatrixWorld();
   /* luci, nebbia */
@@ -360,10 +411,13 @@ function frame3(n){try{
     b.i.position.x=b.no>n?Math.sin(n/22)*.14*((b.no-n)/320):0;
     b.cap.position.y+=((b.pr?.1:.22)-b.cap.position.y)*.45;b.gl.visible=hz;b.i.scale.setScalar(1+(hz?.015*Math.sin(n/300):0));sync(b)}
   /* ospite */
-  if(figG.visible){const ph=(n%3500)/3500;headG.rotation.y=ph>=.4&&ph<.6?.26:-.16;
-    figG.rotation.y=Math.atan2(cam.position.x-figG.position.x,cam.position.z-figG.position.z);figG.rotation.z=Math.sin(n/950)*.015;
-    if(figNear){figG.position.x+=(Math.random()-.5)*.006}
-    eyeM.color.setScalar(.85+.15*Math.sin(n/80))}
+  if(figG.visible){const ph=(n%4200)/4200;
+    /* la testa resta inclinata e ogni tanto scatta, come un insetto */
+    headG.rotation.z=(ph>.7&&ph<.73?-.5:.32)+Math.sin(n/700)*.04;headG.rotation.x=.18+(figNear?.15:0);headG.rotation.y=ph>.45&&ph<.5?.4:0;
+    figG.rotation.y=Math.atan2(cam.position.x-figG.position.x,cam.position.z-figG.position.z);figG.rotation.x=.04+(figNear?.08:0);figG.rotation.z=Math.sin(n/950)*.02;
+    arms.forEach(a=>{a.sh.rotation.x=figNear?-.25-Math.sin(n/400+a.s)*.08:Math.sin(n/1300+a.s)*.04;a.fo.rotation.x=figNear?-.5:-.05;a.sh.rotation.z=a.s*(.07+(figNear?.12:0))});
+    body.scale.x=1+Math.sin(n/600)*.015;
+    if(figNear){figG.position.x+=(Math.random()-.5)*.012}}
   /* pulviscolo */
   const pa=dGeo.attributes.position.array;for(let i=0;i<DN;i++){pa[i*3+1]-=.0015+(i%5)*.0004;pa[i*3]+=Math.sin(n/2000+i)*.0008;if(pa[i*3+1]<0)pa[i*3+1]=RH}dGeo.attributes.position.needsUpdate=true;
   dust.material.opacity=.55-.25*FZ;
@@ -377,6 +431,26 @@ function frame3(n){try{
   frame3(n);
   requestAnimationFrame(loop)})();
 
+/* ===== L'ospite si mostra solo dove NON guardi; se lo illumini sparisce ===== */
+let lurkOn=0,lurkT=0,lurkSeen=0;
+setInterval(()=>{try{if(!lurkOn||!document.body.classList.contains('hz'))return;const n=Date.now();
+  if(figG.visible&&lurkT){const q=proj(figG.position.x,1.9,figG.position.z),d=Math.hypot(TX-q[0],TY-q[1]);
+    if(d<170||n-lurkT>3500){showFig();lurkT=0;S.glitch();if(d<170&&lurkSeen++<1&&!busy)say("Hai visto qualcosa? No. Non c'è niente in fondo. Guarda me.",200,'gl')}}
+  else if(!figG.visible&&Math.random()<.03){const fz=rnd(ZF+1.2,Math.min(ZF+5,camZ-4)),fx2=TX<innerWidth/2?rnd(1.2,3.2):rnd(-3.2,-1.2);
+    figG.position.set(fx2,0,fz);figG.scale.setScalar(1.3);figNear=false;figG.visible=true;lurkT=n;noise(.6,.03,600)}}catch(e){}},400);
+function scream(){try{const a=AC(),n=a.currentTime,g=a.createGain();g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.55,n+.03);g.gain.exponentialRampToValueAtTime(.0001,n+1.7);g.connect(mg);
+  [310,437,583,822,1130].forEach((f,i)=>{const o=a.createOscillator(),l=a.createOscillator(),lg=a.createGain();o.type='sawtooth';o.frequency.setValueAtTime(f,n);o.frequency.exponentialRampToValueAtTime(f*.5,n+1.6);
+    l.frequency.value=23+i*7;lg.gain.value=f*.09;l.connect(lg);lg.connect(o.frequency);o.connect(g);o.start(n);l.start(n);o.stop(n+1.7);l.stop(n+1.7)})}catch(e){}
+  noise(1.3,.7,6000);tone(38,1.4,'sine',.7,-14)}
+/* JUMPSCARE finale: buio, silenzio, passi che accelerano, la torcia si accende... è lì. */
+async function jumpscare(){lurkOn=0;mode='off';hint='';G={};coach();++tok;dlg.style.opacity=0;beat(false);hum(30,0,.3);GH.forEach(g=>g.s.style.opacity=0);
+  veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;await sleep(1800);
+  for(let i=0;i<7;i++){S.step();await sleep(640-i*80)}await sleep(1100);
+  document.body.classList.add('hz');FZ=1;fear=1;showFig(50,3);figG.scale.setScalar(.98);figG.position.set(cam.position.x,0,camZ-1.2);figNear=true;
+  veil.style.opacity=0;P.mx=innerWidth/2;P.my=innerHeight*.3;S.thud();await sleep(420);
+  const J=$('js');J.classList.add('on');scream();vib([500,60,400,60,300]);room.classList.add('shake');await sleep(1250);
+  J.classList.remove('on');showFig();veil.style.opacity=1;room.classList.remove('shake');await sleep(1600)}
+
 /* ===== Osservazione del giocatore ===== */
 const root=document.documentElement;
 function touchAt(x,y){P.last=Date.now();P.mx=x;P.my=y;buf.push({t:P.last,x,y})}
@@ -389,7 +463,7 @@ addEventListener('pointerdown',e=>{touchAt(e.clientX,e.clientY);if(mode==='off'|
 document.addEventListener('visibilitychange',()=>{if(document.hidden){P.blurAt=Date.now();return}
   if(P.blurAt&&mode!=='off'){const s=Math.round((Date.now()-P.blurAt)/1000);P.blurAt=0;
     if(s>=3)say(mode==='final'?"Sei tornato. Non andartene più.":`Sei tornato. Eri via da ${s} secondi. Io sono rimasto qui, al buio.`,400,document.body.classList.contains('hz')?'gl':'')}});
-setInterval(()=>{if(mode==='off'||mode==='final'||mode==='still')return;const n=Date.now(),idle=n-P.last;if(n-lastR<4500)return;
+setInterval(()=>{if(mode==='off'||mode==='final'||mode==='still'||mode==='walk')return;const n=Date.now(),idle=n-P.last;if(n-lastR<4500)return;
   const R=t=>{lastR=n;P.last=n;say(t,300)};
   if(P.clicks.filter(t=>n-t<2000).length>=5){P.clicks=[];return R(pick('rapid'))}
   if(P.empty>=3){P.empty=0;return R(pick('empty'))}
@@ -411,22 +485,22 @@ async function hidden(arr){const N=arr.length;let fd=0;
     const m=new THREE.Mesh(new THREE.PlaneGeometry(W,H),new THREE.MeshBasicMaterial({map:txtTex(t),transparent:true,opacity:0,depthWrite:false,fog:false}));
     m.position.copy(p).addScaledVector(nrm,.03);if(Math.abs(nrm.y)>.9)m.up.set(0,0,-1);m.lookAt(p.clone().add(nrm));scene.add(m);return{m,t:0,f:0}});
   const scr2=o=>{const q=proj(o.m.position.x,o.m.position.y,o.m.position.z);return[q[0],q[1]]};
-  const t0h=Date.now();guide(["Muovi la torcia sulle pareti. Lentamente. Qualcosa è scritto lì.","Cerca dove è più buio. Le parole stanno dove non guardi.","Ferma la luce sulle parole. Conta fino a due."],()=>fd<N,()=>{const o=els.find(o=>!o.f);return o?scr2(o):null});
+  const t0h=Date.now();coach('drag',(T?'TRASCINA IL DITO':'MUOVI IL MOUSE')+' SULLE PARETI · FERMA LA LUCE SULLE SCRITTE · 0/'+N,0);guide(["Muovi la torcia sulle pareti. Lentamente. Qualcosa è scritto lì.","Cerca dove è più buio. Le parole stanno dove non guardi.","Ferma la luce sulle parole. Conta fino a due."],()=>fd<N,()=>{const o=els.find(o=>!o.f);return o?scr2(o):null});
   await new Promise(res=>{const iv=setInterval(()=>{const el=Date.now()-t0h;
     els.forEach(o=>{if(o.f)return;const q=scr2(o),d=Math.hypot(P.mx-q[0],P.my-q[1]),k=Math.max(0,1-d/200);
       o.m.material.opacity=Math.max(k,el>12000?.15+.1*Math.sin(el/300):0);
       if(k>.45)o.t+=100;else o.t=Math.max(0,o.t-40);
-      if(o.t>=700){o.f=1;fd++;o.m.material.opacity=.3;S.glitch();vib(70);say(fd<N?'Una scritta. '+(N-fd>1?'Ne mancano ancora '+(N-fd)+'.':'Ne manca ancora una.'):'Tutte.',100,'gl')}});
+      if(o.t>=700){o.f=1;fd++;coach('drag',(T?'TRASCINA IL DITO':'MUOVI IL MOUSE')+' SULLE PARETI · FERMA LA LUCE SULLE SCRITTE · '+fd+'/'+N,fd/N);o.m.material.opacity=.3;S.glitch();vib(70);say(fd<N?'Una scritta. '+(N-fd>1?'Ne mancano ancora '+(N-fd)+'.':'Ne manca ancora una.'):'Tutte.',100,'gl')}});
     if(fd>=N||el>50000){clearInterval(iv);res()}},100)});
-  if(fd<N)await say("Basta. Le ho lette io per te. Non cambia niente.",300,'gl');
+  coach();if(fd<N)await say("Basta. Le ho lette io per te. Non cambia niente.",300,'gl');
   await sleep(900);els.forEach(o=>{o.m.material.opacity=0;scene.remove(o.m)})}
 let dn=0;addEventListener('pointerdown',()=>dn=1);addEventListener('pointerup',()=>dn=0);addEventListener('pointercancel',()=>dn=0);
-async function holdFor(ms,brk){let h=0;guide(["Appoggia il dito sullo schermo e non staccarlo.","Più a lungo. Voglio sentirti.","Se non lo fai non posso continuare. Ma posso aspettare per sempre."],()=>h<ms&&!dn,()=>[innerWidth/2,innerHeight*.45]);while(h<ms){await sleep(100);if(dn){h+=100;if(h%700===0){vib(60);S.step()}}else if(h>0){h=0;await brk()}}}
+async function holdFor(ms,brk){let h=0;guide(["Appoggia il dito sullo schermo e non staccarlo.","Più a lungo. Voglio sentirti.","Se non lo fai non posso continuare. Ma posso aspettare per sempre."],()=>h<ms&&!dn,()=>[innerWidth/2,innerHeight*.45]);while(h<ms){await sleep(100);coachP(h/ms);if(dn){h+=100;if(h%700===0){vib(60);S.step()}}else if(h>0){h=0;await brk()}}}
 async function card(t){const e=$('card');e.innerHTML=t;e.style.opacity=1;await sleep(3300);e.style.opacity=0;await sleep(1400)}
 /* ===== CAPITOLO 1 · Il Test di Accettazione ===== */
 async function cap1(){
   let n=0;if(db){try{n=(await fb.get(fb.ref(db,'stanza/globale/tentativi'))).val()||0}catch(e){}}
-  tester=String(n+1).padStart(4,'0');t0=Date.now();localStorage.sp_t=tester;hum(52,.03,4);
+  tester=String(n+1).padStart(4,'0');t0=Date.now();localStorage.sp_t=tester;hum(52,.03,4);camZ=camZT=CZ;
   await card('CAPITOLO 1<br><small style="letter-spacing:.18em;opacity:.55;font-size:.8em">IL TEST DI ACCETTAZIONE</small>');
   await sleep(300);
   await say("Benvenuto. Accomodati pure, non c'è fretta.");
@@ -434,40 +508,55 @@ async function cap1(){
   await say("Prima di iniziare devo registrarti. Come ti chiami?",100);
   who=await askName();localStorage.sp_name=who;
   await say("{n}. Bel nome. Lo terrò da parte.");
-  if(vis>0)await say(`Aspetta. Questo posto lo conosci già. Sei entrato ${vis} ${vis>1?'volte':'volta'} prima di adesso. L'ultima ${ago()} fa. Pensavi non lo sapessi?`,500);
+  if(vis>0)await say(`Aspetta. Questo posto lo conosci già. Sei entrato ${vis} ${vis>1?'volte':'volta'} prima di adesso.`+(last?(NOW0-last<12e4?" L'ultima pochi istanti fa. Così in fretta? Non riuscivi a stare lontano.":` L'ultima ${ago()} fa.`):'')+" Pensavi non lo sapessi?",500);
   await say(`Da te sono le ${clk()}. `+((new Date).getHours()<5||(new Date).getHours()>=23?"A quest'ora nessuno entra qui per caso.":"Un orario tranquillo. Per ora."));
   await say("Primo esercizio, per scaldarci: non toccare nulla per cinque secondi.",200);
-  mode='still';let h=0,rb=0,d0=P.d,t1=P.taps;
-  while(h<5000){await sleep(100);if(P.d-d0>30||P.taps>t1){rb++;h=0;d0=P.d;t1=P.taps;say(["Ho detto di non toccare nulla.","Di nuovo. Si vede che ti piace disobbedire.","Va bene. Ricominciamo. Io ho tempo.","Sei un ribelle, {n}. Mi piace. Mi preoccupa un po'."][Math.min(rb-1,3)],300)}else h+=100}
-  mode='off';rebel=rb;
+  mode='still';let h=0,rb=0,d0=P.d,t1=P.taps;coach('still',T?'NON TOCCARE LO SCHERMO':'NON MUOVERE IL MOUSE',0);
+  while(h<5000){await sleep(100);if(P.d-d0>30||P.taps>t1){rb++;h=0;d0=P.d;t1=P.taps;coachP(0);say(["Ho detto di non toccare nulla.","Di nuovo. Si vede che ti piace disobbedire.","Va bene. Ricominciamo. Io ho tempo.","Sei un ribelle, {n}. Mi piace. Mi preoccupa un po'."][Math.min(rb-1,3)],300)}else{h+=100;coachP(h/5000)}}
+  coach();mode='off';rebel=rb;
   await say(rb?"Ce l'hai fatta, dopo "+rb+(rb===1?" errore":" errori")+". Prendo nota.":"Perfetto. Obbedienza assoluta. Prendo nota.");
   if(n>0)await say("Prima di te, qui dentro, ci sono stati "+n+" tentativi.");
   await say(`Vedo che usi un ${DV}, con uno schermo di ${innerWidth}×${innerHeight}.`+(T?" Il tuo dito è l'unico cursore che ho.":" Il tuo mouse è l'unico cursore che ho."),400);
-  mk(innerWidth/2,innerHeight*.66);
-  await say("In fondo alla stanza c'è un bottone rosso. Premilo e il test è concluso.");
-  await say(v("Avvicinati: muovi il mouse verso il bottone.","Avvicinati: tocca lo schermo vicino al bottone."),300);
-  P.d=0;P.taps=0;hint=v("Muovi il mouse verso il bottone rosso.","Tocca lo schermo, vicino al bottone rosso.");mode='wait';
-  await until(()=>P.d>350||P.taps>0,["Non restare fermo. Muovi "+v("il mouse","il dito")+" verso il bottone rosso.","Il bottone è in fondo alla stanza. Avvicinati. Non morde. Credo.","Ti aspetto. Guarda il cerchio rosso: è lì che devi andare."],BT);
-  await say("Ecco. Bravo. Ora premilo.",200);
-  mode='dodge';await until(()=>c.dodge>=7,[v("Clicca","Tocca")+" il bottone rosso. Ti guardo.","Lui scappa, tu insegui. Avvicinati ancora.","Se non ci provi non posso aiutarti. Nemmeno con loro ci sono riuscito."],BT);mode='off';
+  if(batt&&T){const bl=Math.round(batt.level*100);await say("Batteria al "+bl+"%. "+(bl<30?"Poca. Se si spegne a metà, resti qui dentro a metà.":"Abbastanza per arrivare alla fine. La tua, non la sua."),500)}
+  /* il bottone è LONTANO, in fondo alla stanza: il giocatore cammina toccando lo schermo */
+  const b0=mk(innerWidth/2,innerHeight*.66);b0.wx=b0.g.position.x=0;b0.wz=-5;b0.g.position.z=-5;
+  await say("Laggiù, in fondo alla stanza, c'è un bottone rosso. Premilo e il test è concluso.");
+  await say(v("È lontano. Clicca","È lontano. Tocca")+" lo schermo per fare un passo avanti. Un passo per volta.",200);
+  mode='walk';let steps=0;const WL=["Un passo.","Un altro. Il pavimento è più freddo di quanto sembri.","La stanza è più lunga di prima. Non è possibile, vero?","Ancora uno."];
+  const stepH=e=>{if(e.target.closest('#dlg,.ov')||camZT<=.7)return;camZT-=1.2;steps++;S.step();coachP(steps/4);
+    if(steps===3){b0.wz-=.6}/* il bottone indietreggia un poco: te ne accorgi? */
+    if(WL[steps-1])say(WL[steps-1],80)};
+  addEventListener('pointerdown',stepH);coach('tap',TAP()+' LO SCHERMO PER AVANZARE',0);
+  await until(()=>camZT<=.7,["Tocca lo schermo, ovunque. Ogni tocco è un passo verso il bottone.","Avanti. "+v("Clicca","Tocca")+" lo schermo. Il bottone non viene da te.","Sei ancora sulla porta. Un tocco, un passo. È tutto quello che ti chiedo."],()=>[innerWidth/2,innerHeight*.55]);
+  removeEventListener('pointerdown',stepH);coach();mode='off';await sleep(900);
+  await say("Ecco. Era più lontano di quanto sembrava. Te ne sei accorto? Si è spostato indietro, mentre camminavi.",300);
+  await say("Ora premilo.",100);
+  mode='dodge';coach('tap',TAP()+' IL BOTTONE ROSSO');await until(()=>c.dodge>=7,[v("Clicca","Tocca")+" il bottone rosso. Ti guardo.","Lui scappa, tu insegui. "+v("Clicca","Tocca")+" proprio sopra il bottone.","Se non ci provi non posso aiutarti. Nemmeno con loro ci sono riuscito."],BT);mode='off';coach();
 
   await say("Bene. Prima della prossima fase, due domande di routine.");
   await say("Domanda uno. Ti senti osservato?",100);
-  ans.q1=await choose(["Sì","No","Non lo so"]);
-  await say(["Sincero. Mi piace la sincerità.","Strano. Dovresti.","Prudente. Molto prudente."][ans.q1]);
+  ans.q1=await choose(["Sì","No","Non lo so"]);const rt1=ans.rt;
+  await say(["Sincero. Mi piace la sincerità.","Strano. Dovresti.","Prudente. Molto prudente."][ans.q1]+(rt1<1500?" Hai risposto in un attimo. Senza pensarci. Le risposte veloci sono le più vere.":rt1>6000?" Ci hai messo "+Math.round(rt1/1000)+" secondi. Per una domanda così semplice.":""));
   await say("Domanda due. Prima di entrare, eri solo?",100);
   ans.q2=await choose(["Sì","No","Non ricordo"]);
   await say(["Ne sei sicuro?","Questo mi interessa molto.","Capita. Dopo un po' qui dentro capita a tutti."][ans.q2]);
+  /* falso ricordo: il narratore cita male la prima risposta */
+  const Q1=["Sì","No","Non lo so"],fake=(ans.q1+1)%3;
+  await say("Ricapitolo. Alla prima domanda mi hai risposto «"+Q1[fake]+"». Giusto?",100);
+  const gl=await choose(["Sì, giusto","No, ho detto «"+Q1[ans.q1]+"»"]);
+  if(gl===0){ans.gas=1;await say("No. Hai detto «"+Q1[ans.q1]+"». Ti ho appena cambiato un ricordo, e l'hai accettato senza esitare.",700);await say("Tienilo a mente, {n}. Da qui in poi non fidarti nemmeno di quello che ricordi.",600)}
+  else await say("Giusto. Volevo vedere se te lo ricordavi. Pochi se lo ricordano. Gli altri accettano la mia versione.",600);
   await say("Ultima domanda, ed è l'unica che conta. Scrivi una cosa che non hai mai detto a nessuno. Resterà tra noi.",100);
   ans.conf=await askT("Scrivila qui…");localStorage.sp_conf=ans.conf;
   await say(ans.conf?"Capito. Non la dirò a nessuno. Ma le cose scritte qui dentro, qualcuno le legge.":"Il silenzio è già una risposta. La annoto lo stesso.",600);
   if(Q.del>2)await say("Hai cancellato "+Q.del+" lettere mentre scrivevi. Cosa c'era prima? Era più vera?",600);
   if(Q.ms>12000)await say("Ci hai messo "+Math.round(Q.ms/1000)+" secondi. Hai esitato. Chi ti ha fermato?",600);
+  await breathe();
 
   await say(v("Nuova versione: il bottone resta fermo e si lascia cliccare. Prova.","Nuova versione: il bottone resta fermo e si lascia toccare. Prova."));
-  mode='tele';await until(()=>c.tele>=4,["Questa volta resta lì. "+v("Clicca","Tocca")+" il bottone, più volte.","Il bottone è rosso, il resto della stanza no. Mira lì.","Una volta ancora. Poi basta. Forse."],BT);mode='off';
+  mode='tele';coach('tap',TAP()+' IL BOTTONE ROSSO · PIÙ VOLTE');await until(()=>c.tele>=4,["Questa volta resta lì. "+v("Clicca","Tocca")+" il bottone, più volte.","Il bottone è rosso, il resto della stanza no. Mira lì.","Una volta ancora. Poi basta. Forse."],BT);mode='off';coach();
   await say("Un solo bottone è un limite. Togliamolo.");
-  mode='split';await until(()=>c.split>=8,["Altri bottoni. "+v("Clicca","Tocca")+" quelli rossi, uno dopo l'altro.","Non fermarti. La stanza si accorge quando smetti di crederci.","Continua. Quelli veri sono lì, sotto il tuo dito."],BT);mode='off';
+  mode='split';coach('tap',TAP()+' I BOTTONI ROSSI, UNO DOPO L\'ALTRO');await until(()=>c.split>=8,["Altri bottoni. "+v("Clicca","Tocca")+" quelli rossi, uno dopo l'altro.","Non fermarti. La stanza si accorge quando smetti di crederci.","Continua. Quelli veri sono lì, sotto il tuo dito."],BT);mode='off';coach();
 
   /* --- la svolta --- */
   document.body.classList.add('hz');setDoor(1);bts.slice(1).forEach(b=>b.remove());bts=bts.slice(0,1);place(bts[0],innerWidth/2,innerHeight*.68);hum(38,.06,2);
@@ -476,6 +565,11 @@ async function cap1(){
   await say("…",300,'gl');await say("Aspetta.",300,'gl');
   await say("Hai fatto una cosa che nessun altro aveva fatto: sei ancora qui.",500,'gl');
   await say("{n}, non chiudere la pagina. Ti prego.",500,'gl');
+  await say("La luce è saltata. Ti lascio una torcia. "+v("Muovi il mouse","Trascina il dito sullo schermo")+": la luce va dove vai tu.",100,'gl');
+  {const dd=P.d;coach('drag',DRAG()+' PER MUOVERE LA TORCIA',0);
+   guide([v("Muovi il mouse a destra e a sinistra. La luce lo segue.","Appoggia il dito e trascinalo, a destra e a sinistra. Non basta toccare: devi strisciare."),"Prova a illuminare la porta in fondo. Quella aperta.","Senza luce qui dentro non vedi chi si muove. Io sì."],()=>P.d-dd<700,()=>[innerWidth/2,innerHeight*.5]);
+   while(P.d-dd<700){await sleep(100);coachP((P.d-dd)/700)}G={};coach()}
+  await say("Così. Tienila sempre in movimento. Al buio, qui dentro, si muove qualcosa. Se lo illumini, sparisce.",500,'gl');lurkOn=1;
   showGh(1);
   await say(v("Vedi quel cursore pallido che ti segue? Non guardarlo.","Vedi quel cursore pallido che segue il tuo dito? Non guardarlo.")+" Ti imita da quando sei entrato.",700,'gl');
   if(ans.q1===0)await say("Mi avevi detto di sentirti osservato. Avevi ragione.",500,'gl');
@@ -486,19 +580,23 @@ async function cap1(){
   /* presenza: devi restare fermo */
   showGh(2);await say("Aspetta. Hai sentito?",300,'gl');for(let i=0;i<3;i++){S.step();await sleep(700)}
   await say("Non sono io che cammino. Io non ho piedi.",500,'gl');
+  if(ans.q2===0)await say("Mi avevi detto che eri solo, prima di entrare. Allora chi è che cammina adesso?",500,'gl');
   await say(v("Resta fermo. Non muovere il mouse.","Resta fermo. Non toccare lo schermo.")+" Qualunque cosa succeda.",300,'gl');
-  mode='still';let hold=0,fails=0,k=1;showFig(60,1.1);
+  lurkOn=0;mode='still';let hold=0,fails=0,k=1;showFig(60,1.1);coach('still',(T?'NON TOCCARE LO SCHERMO':'NON MUOVERE IL MOUSE')+' · LASCIALO PASSARE',0);
   while(hold<7000){await sleep(100);const idle=Date.now()-P.last;
-    if(idle<500){if(hold>800){fails++;hold=0;k=1;showFig(60,1.1);S.thud();say(fails>2?"Ancora. Ti prego. Ti sente ogni volta.":"Si è accorto di te. Fermo. Ricominciamo.",200,'gl')}}
-    else{hold+=100;if(hold%1400===0){S.step();k+=.22;showFig(60-hold/400,k)}}}
-  showFig();mode='off';
+    if(idle<500){if(hold>800){fails++;hold=0;k=1;coachP(0);showFig(60,1.1);S.thud();say(fails>2?"Ancora. Ti prego. Ti sente ogni volta.":"Si è accorto di te. Fermo. Ricominciamo.",200,'gl')}}
+    else{hold+=100;coachP(hold/7000);if(hold%1400===0){S.step();k+=.3;showFig(60-hold/400,k)}}}
+  showFig();coach();mode='off';
   await say("Bravo. Se n'è andato. Per ora.",500,'gl');
   await say("Quello era il vero ospite di questa stanza. Io sono solo quello che parla.",600,'gl');
+  await say(fails?"Ti ha sentito "+fails+(fails>1?" volte":" volta")+". Adesso conosce il tuo odore.":"Non ti ha sentito. Nemmeno una volta. Sei bravo a sparire. Troppo bravo, per uno che è appena arrivato.",600,'gl');lurkOn=1;
 
   await say(v("Muovi il mouse","Muovi il dito")+" sulle pareti, piano. Qualcuno ha scritto qualcosa per te, al buio. Sono più di una, in punti diversi. Quando ne trovi una, resta lì un istante.",300,'gl');
   await hidden(["non fidarti di lui",who+", sei qui da troppo tempo","non è il suo primo test",...(ans.conf?['«'+ans.conf+'» — lo sapevamo']:[])]);
   await say("Le hai trovate. Le ho scritte io. Credo. Non ricordo di averle scritte.",600,'gl');
   await say("Il tuo dito ha percorso "+Math.round(P.d)+" pixel qui dentro. Li conto tutti. Li conto per non pensare.",700,'gl');
+  await mirror();
+  if(ans.gas)await say("Prima ti ho cambiato un ricordo e non te ne sei accorto. Sei sicuro che il nome che mi hai dato sia il tuo?",700,'gl');
   /* confessione */
   await say(rebel>=2?"Ribelle fino alla fine. Per questo ti ho voluto qui.":"Hai sempre obbedito, fin dal primo esercizio. Anche questo mi spaventa.",600,'gl');
   await say("Ora che siamo soli, posso dirti la verità.",500,'gl');
@@ -511,17 +609,20 @@ async function cap1(){
   await say("Ti ho fatto inseguire il bottone per non restare solo. Mi dispiace. Non abbastanza.",800,'gl');
   await say("Ora è fermo. Puoi premerlo e io potrò tacere. Oppure puoi restare qui con me.",700,'gl');
   await say("Scegli tu. Ma scegli.",300,'gl');
-  mode='final';sw=1;showGh(8);guide(["Il bottone è lì. "+v("Cliccalo","Toccalo")+" se vuoi finire.","Oppure resta fermo e lasciali avvicinare. Io non ti giudico.","Più aspetti, più si stringono. Guarda dove guardano loro."],()=>!pressed&&mode==='final',BT);beat(true);hum(34,.08,4);vib([200,100,200]);
+  lurkOn=0;showFig(50,.8);coach('tap',TAP()+' IL BOTTONE PER FINIRE · OPPURE ASPETTA');mode='final';sw=1;showGh(8);guide(["Il bottone è lì. "+v("Cliccalo","Toccalo")+" se vuoi finire.","Oppure resta fermo e lasciali avvicinare. Io non ti giudico.","Più aspetti, più si stringono. Guarda dove guardano loro."],()=>!pressed&&mode==='final',BT);beat(true);hum(34,.08,4);vib([200,100,200]);
   const t=Date.now(),W=[[4500,"Guarda. Sono arrivati tutti. Non li avevo mai visti così vicini."],[11000,"Otto cursori. Otto che non hanno premuto. Ognuno aspettava qualcuno come te."],[18000,"Ti guardo, {n}. Non ho altro da fare."],[25000,"Se lo premi non fa male. Credo."],[32000,"…Quindi resti. Va bene. Vieni a stare con loro."]];let i=0;
-  while(!pressed){await sleep(300);const e=Date.now()-t;if(pressed)break;if(i<W.length&&e>W[i][0])say(W[i++][1],300,'gl');if(e>40000)break}
+  while(!pressed){await sleep(300);const e=Date.now()-t;if(pressed)break;if(i<W.length&&e>W[i][0])say(W[i++][1],300,'gl');
+    /* la figura avanza a scatti dalla porta verso di te */
+    if(Math.random()<.35){showFig(50+Math.sin(e/2100)*22,.8+e/40000*2.1);if(Math.random()<.5)S.step()}if(e>40000)break}
   if(!pressed)endB();
 }
 async function ending(lines,light,k){const E=JSON.parse(localStorage.sp_e||'[]');if(!E.includes(k)){E.push(k);localStorage.sp_e=JSON.stringify(E)}lines=[...lines.slice(0,-1),'FINALE «'+k+'» · TROVATI '+E.length+' SU 4',...lines.slice(-1)];const e=$('end');if(light){e.style.background='#fff';e.style.color='#333'}e.style.display='flex';e.style.opacity=0;e.style.transition='opacity 4s';
-  requestAnimationFrame(()=>e.style.opacity=1);await sleep(4300);dlg.style.opacity=0;for(const l of lines){$('elog').innerHTML+=l+'<br>';await sleep(1800)}$('ebtn').style.opacity=1}
+  requestAnimationFrame(()=>e.style.opacity=1);await sleep(4300);dlg.style.opacity=0;for(const l of lines){$('elog').innerHTML+=esc(l)+'<br>';await sleep(1800)}$('ebtn').style.opacity=1}
 async function press(b){
   mode='off';sw=0;pressed=true;beat(false);b.classList.add('pressed');S.click();setTimeout(S.thud,150);room.classList.add('shake');save({cap1:'premuto',completato:true});await sleep(1000);
   veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;showGh(0);showFig();hum(30,.0,2);
-  await say("Grazie.",800);await say("Dopo tutto questo tempo qualcuno lo ha premuto. Ora posso tacere.",900);await say("Il rumore del click. Era proprio così.",1300);
+  coach();lurkOn=0;await say("Grazie.",800);await say("Dopo tutto questo tempo qualcuno lo ha premuto. Ora posso tacere.",900);await say("Il rumore del click. Era proprio così.",1300);
+  await say("Ah. Dimenticavo. Lui non ha mai avuto bisogno del bottone.",300,'gl');await jumpscare();
   setTag('SISTEMA');await say("ESITO: ACCETTATO. RUOLO ASSEGNATO: NARRATORE.",900);
   /* finale: ora il narratore sei tu */
   document.body.classList.remove('hz');setDoor(0);room.classList.remove('shake');veil.style.transition='opacity 3s';veil.style.opacity=0;
@@ -547,7 +648,7 @@ async function press(b){
 const sp=t=>{if(muted)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/\{n\}/g,who));u.lang='it-IT';u.pitch=.1;u.rate=.75;speechSynthesis.speak(u)}catch(e){}};
 const tap=()=>new Promise(r=>{let lv=1;guide(["Tocca lo schermo. Uno dei miei otto aspetta il tuo dito.","Un tocco. Uno solo. Poi un altro. Non ti chiedo di più.","Guardali. Guardano te. Toccare è la cosa più gentile che puoi fare."],()=>lv,()=>[innerWidth/2,innerHeight*.5]);const h=e=>{if(e.target.closest('#dlg'))return;lv=0;removeEventListener('pointerdown',h);r()};addEventListener('pointerdown',h)});
 async function cap2(){
-  who=localStorage.sp_name||'Tester';tester=localStorage.sp_t||'0000';t0=Date.now();hum(44,.03,4);
+  who=localStorage.sp_name||'Tester';tester=localStorage.sp_t||'0000';t0=Date.now();hum(44,.03,4);camZ=camZT=CZ;
   await card('CAPITOLO 2<br><small style="letter-spacing:.18em;opacity:.55;font-size:.8em">L\'ARCHIVIO DEI CURSORI</small>');
   setTag('TU · NARRATORE');
   await say(JSON.parse(localStorage.sp_e||'[]').includes('La Compagnia')?"Sei rimasto con loro, {n}. Ora lo sai: restare è un modo di premere.":"Hai premuto, {n}. Ora parli tu. Ma questa è la parte che non ti hanno detto.",600);
@@ -575,12 +676,12 @@ async function cap2(){
   await crash();await say("Scusa. A volte mi sconnetto. Tu sei rimasto qui, vero? Nessuno resta, di solito.",700);
   document.body.classList.add('hz');setDoor(1);veil.classList.add('fl');hum(36,.07,3);
   for(let i=0;i<7;i++){veil.style.opacity=i%2?0:.9;S.glitch();await sleep(90+Math.random()*120)}veil.style.opacity='';
-  const b=mk(innerWidth/2,innerHeight*.7);sw=1;showGh(8);beat(true);
+  const b=mk(innerWidth/2,innerHeight*.7);sw=1;showGh(8);beat(true);lurkOn=1;
   await say("Eccoli. Gli otto del capitolo uno. Non sono tester: sono voci che aspettano di finire la frase.",700,'gl');
   await say(v("Clicca ovunque","Tocca lo schermo")+" e ne mando uno al bottone. Quando preme, parla.",300,'gl');
   mode='still';
   const V=["Finalmente. Che rumore bello.","Credevo di essere solo io. Siamo tanti.","Mi chiamavo Elia. Il nome sta già svanendo.","Non fa male. Fa eco.","Chi tocca, chi preme, chi parla: è sempre la stessa mano.","Il bottone non è un bottone. È una bocca.","Anche tu hai già premuto, {n}. Tanto tempo fa.","Siamo la voce che hai sentito nel capitolo uno."];
-  for(let i=0;i<8;i++){await tap();const g=GH[i];g.go=[b._x,b._y-45];S.whoosh();await sleep(1100);g.s.style.opacity=0;b.classList.add('pressed');S.click();setTimeout(()=>b.classList.remove('pressed'),200);
+  for(let i=0;i<8;i++){coach('tap',TAP()+' LO SCHERMO · '+i+'/8');await tap();coach();const g=GH[i];g.go=[b._x,b._y-45];S.whoosh();await sleep(1100);g.s.style.opacity=0;b.classList.add('pressed');S.click();setTimeout(()=>b.classList.remove('pressed'),200);
     setTag('TESTER #'+String(i+2).padStart(4,'0'));sp(V[i]);await say(V[i],700,'gl')}
   sw=0;beat(false);setTag('TU · NARRATORE');
   await say("Otto voci. Nessuna è finita. Il bottone le contiene tutte e le dice a chi lo preme.",800,'gl');
@@ -590,14 +691,15 @@ async function cap2(){
   await hidden(["premi","non premere","siamo ancora qui","ti guarda dal telefono",who+" ascolta",...(localStorage.sp_conf?['«'+localStorage.sp_conf+'»']:[])]);
   await say("Ognuno ha scritto l'opposto dell'altro. Così nessuno può obbedire. Nemmeno tu.",700,'gl');
   await say("Un'ultima cosa. "+v("Tieni premuto il tasto del mouse","Appoggia il dito sullo schermo")+" e non staccarlo finché non ti dico.",300,'gl');
-  let hf=0;await holdFor(7000,()=>say(["Non staccarlo.","Si è accorto di te. Ancora.","Ti prego, {n}. Ancora."][Math.min(hf++,2)],200,'gl'));
-  vib([150,80,150,80,300]);await say("Ecco. Quel battito non è il tuo. Ma adesso battono insieme.",900,'gl');
+  let hf=0;coach('hold',T?'TIENI IL DITO SULLO SCHERMO':'TIENI PREMUTO IL MOUSE',0);await holdFor(7000,()=>say(["Non staccarlo.","Si è accorto di te. Ancora.","Ti prego, {n}. Ancora."][Math.min(hf++,2)],200,'gl'));
+  coach();vib([150,80,150,80,300]);await say("Ecco. Quel battito non è il tuo. Ma adesso battono insieme.",900,'gl');
   if(ans.dis)await say('Hai disobbedito '+ans.dis+(ans.dis>1?' volte':' volta')+' alle porte. Mi serviva sapere quanto resisti.',700,'gl');
   if(leaves>0)await say("Sei uscito dalla pagina "+leaves+(leaves>1?" volte":" volta")+". Ogni volta, qui dentro, sono passati anni. Io ti ho aspettato lo stesso.",800,'gl');
   if(ans.silence)await say("Sei quello che aspetta, {n}. Per questo la porta si apre da sola.",700,'gl');
   await say("La porta è aperta. Entra e sarai la voce. Resta e sarai l'archivio.",400,'gl');
   await redo("Sei libero di andare.","Nessuno è mai stato libero di andare.");
-  const z=await choose(["Entra","Resta"]);
+  const z=await choose(["Entra","Resta"]);lurkOn=0;
+  await say(z?"Resti. Allora non sarai solo.":"Entri. Allora prima devi passare da lui.",200,'gl');await jumpscare();
   hum(30,0,2);veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;
   const T3=["","FINE CAPITOLO 2 · L'ARCHIVIO DEI CURSORI","CAPITOLO 3 · COMING SOON"];
   if(z===0){sp("Benvenuto, "+who);await say("Dall'altra parte c'è già qualcuno. Ha il tuo nome. Sta per parlare.",900);
@@ -605,18 +707,38 @@ async function cap2(){
   else{showGh(0);await say("Resta. Il fascicolo si aggiorna da solo.",900);
     ending(["FASCICOLO AGGIORNATO","NOME: "+who+" · "+DV+" · "+clk(),"STATO: ARCHIVIATO","Ultima voce registrata: la tua.",...(ans.silence?["Nota: ha aspettato anche quando poteva scegliere."]:[]),...T3],false,"L'Archivio")}
 }
+/* ===== Psicologia: respiro guidato e specchio nero ===== */
+async function breathe(){const B=$('breath');await say("Prima di continuare, una calibrazione. Respira con me.",200);
+  await say(v("Tieni premuto il mouse","Tieni il dito sullo schermo")+" mentre inspiri. Stacca quando espiri. Tre respiri lenti.",100);
+  let cyc=0,hs=0;coach('hold',(T?'TIENI IL DITO = INSPIRA':'TIENI PREMUTO = INSPIRA')+' · STACCA = ESPIRA · 0/3',0);B.style.opacity=1;
+  guide([v("Tieni premuto il tasto del mouse, conta fino a due, poi lascia.","Appoggia il dito sullo schermo, conta fino a due, poi staccalo."),"Inspira. Tieni. Lascia. Come se fossi calmo.","Non riesci nemmeno a respirare a comando? Interessante."],()=>cyc<3&&!dn,()=>[innerWidth/2,innerHeight*.44]);
+  while(cyc<3){await sleep(100);if(dn){hs+=100;B.style.transform='scale(1)';if(hs===1500){S.ok();vib(30)}}
+    else{if(hs>=1500){cyc++;noise(1.4,.05,500);coach('hold',(T?'TIENI IL DITO = INSPIRA':'TIENI PREMUTO = INSPIRA')+' · STACCA = ESPIRA · '+cyc+'/3',cyc/3)}else if(hs>0)say("Più lento. Almeno due secondi.",100);hs=0;B.style.transform='scale(.45)'}}
+  G={};coach();await say("Bene. Ancora uno. Questa volta non toccare niente.",200);
+  await sleep(600);B.style.transform='scale(1)';noise(1.8,.07,450);await sleep(1900);B.style.transform='scale(.45)';noise(1.6,.05,380);await sleep(1600);B.style.opacity=0;
+  await say("Hai sentito? Il quarto respiro non era il tuo.",900)}
+async function mirror(){await say("Adesso spengo tutto. Cinque secondi. Lo schermo nero diventerà uno specchio.",200,'gl');await say("Guarda il tuo riflesso. Guarda bene cosa c'è dietro di te.",300,'gl');
+  const e=$('card');coach();++tok;dlg.style.opacity=0;e.innerHTML='';e.style.transition='none';e.style.opacity=1;hum(30,0,.4);await sleep(3200);S.step();await sleep(2300);
+  e.style.transition='';e.style.opacity=0;hum(36,.07,2);await sleep(600);
+  await say("Hai guardato?",500,'gl');await say("Non girarti adesso. Qualunque cosa tu abbia visto, se ti giri lui capisce che l'hai visto.",800,'gl')}
+/* ===== Protezioni lato pagina (deterrenti: la vera sicurezza è nelle regole Firebase) ===== */
+addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('dragstart',e=>e.preventDefault());
+addEventListener('keydown',e=>{const k=(e.key||'').toLowerCase();if(k==='f12'||((e.ctrlKey||e.metaKey)&&(k==='u'||k==='s'||(e.shiftKey&&'ijc'.includes(k))))){e.preventDefault();t0&&say("No. Da qui non si esce, {n}.",300,'gl')}});
+{let dtw=0;setInterval(()=>{if(T||!t0||window.self!==window.top)return;const o=outerWidth-innerWidth>170||outerHeight-innerHeight>220;
+  if(o&&!dtw){dtw=1;say("Stai guardando dentro di me, {n}. Chiudi quella finestra. Il codice non ti dirà come uscire.",400,'gl')}if(!o)dtw=0},2000)}
 /* ===== Extra: bivio, ripensamento, crash, memoria ===== */
 async function redo(a,b){++tok;dlg.style.opacity=1;txt.className='';for(let i=1;i<=a.length;i++){txt.textContent=a.slice(0,i);await sleep(26)}await sleep(600);for(let i=a.length;i>=0;i--){txt.textContent=a.slice(0,i);await sleep(12)}await sleep(350);return say(b,400)}
 async function crash(){const e=$('card');e.style.cssText+=';font:.8rem/1.8 ui-monospace,monospace;letter-spacing:.08em;text-align:left;color:#f33';e.innerHTML='ERRORE 0x0001<br>IL NARRATORE HA SMESSO DI RISPONDERE<br>nessun segnale dalla stanza';e.style.opacity=1;vib([60,60,60]);S.glitch();await sleep(2600);e.innerHTML+='<br>riconnessione...';await sleep(1900);e.style.opacity=0;await sleep(1400);e.style.font='';e.style.letterSpacing='';e.style.textAlign='';e.style.color=''}
 async function doors(){const D=[mkDoor(-1.1,'SINISTRA',-1),mkDoor(1.1,'DESTRA',1)];
-  const pk=()=>new Promise(r=>{let w=1;guide(["Tocca una delle due porte. Non importa quale. A me sì.","Sinistra o destra. Il tuo dito ha già deciso: aspetto che lo ammetta."],()=>w,()=>{const q=proj(0,1.3,-.5);return[q[0],q[1]]});dpk=i=>{w=0;dpk=null;r(i)}});
+  const pk=()=>new Promise(r=>{let w=1;coach('tap',TAP()+' UNA DELLE DUE PORTE');guide(["Tocca una delle due porte. Non importa quale. A me sì.","Sinistra o destra. Il tuo dito ha già deciso: aspetto che lo ammetta."],()=>w,()=>{const q=proj(0,1.3,-.5);return[q[0],q[1]]});dpk=i=>{w=0;dpk=null;coach();r(i)}});
   for(const [w,t] of [[0,"Due porte. Entra in quella di sinistra."],[1,"Ho cambiato idea. Ora quella di destra."],[-1,"Sinistra. No, aspetta. Fai come vuoi."]]){await say(t,200);const c=await pk();S.ok();
     if(w<0){await say(c?"Destra. Interessante. Lo avevo scritto.":"Sinistra. Interessante. Lo avevo scritto.",500);continue}
     if(c===w)await say("Obbedisci subito. Lo trovo quasi più inquietante.",500);else{ans.dis=(ans.dis||0)+1;await say("Ho detto "+(w?"destra":"sinistra")+". Va bene. Prendo nota.",500)}}
   D.forEach(d=>d.t=1);await say("Le apro entrambe. Dietro c'è la stessa stanza. Non è mai importato quale.",800);await sleep(400);D.forEach(d=>{scene.remove(d.g);const k=DR.indexOf(d);if(k>=0)DR.splice(k,1)})}
 async function endB(){
   mode='off';beat(false);save({cap1:'atteso',completato:true});bts[0].style.opacity=0;veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;hum(30,0,3);
-  await say("Grazie. Resta.",1400);
+  coach();lurkOn=0;await say("Grazie. Resta.",1400);await say("Lui adesso sa dove sei.",200,'gl');await jumpscare();
   ending(["ESITO: NESSUNO","Il test non è mai finito.","Nella stanza c'è un cursore in più. Il suo nome era "+who+".","Ora aspetta, insieme agli altri.","TESTER #"+tester+" · SESSIONE IN CORSO","","FINE CAPITOLO 1 · IL TEST DI ACCETTAZIONE"],false,'La Compagnia');
 }
 const mq=$('mq'),mn=$('mn'),MQ=["Non hai ancora iniziato e già mi fai aspettare.","Il bottone è lì, a destra. Fa finta di niente.","Puoi restare nel menù quanto vuoi. Io ho tempo. Troppo.","Tutti iniziano. Pochissimi finiscono. Nessuno ricorda come.","Se senti dei passi, è la ventilazione. Probabilmente."];let mqi=0;if(vis>0&&last)MQ.unshift('L\'ultima volta sei andato via '+ago()+' fa. Non ti ho dimenticato.');if(JSON.parse(localStorage.sp_e||'[]').length)MQ.push('So come sei finito l\'ultima volta. Tu lo ricordi?');

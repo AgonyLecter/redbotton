@@ -1,0 +1,39 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "stanza": {
+      "globale": {
+        "tentativi": {
+          ".read": true,
+          ".write": "auth != null",
+          ".validate": "newData.isNumber() && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))"
+        },
+        "$altro": { ".validate": false }
+      },
+      "giocatori": {
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid",
+          "cap": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10" },
+          "tentativi": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 100000" },
+          "cap1": { ".validate": "newData.isString() && (newData.val() === 'premuto' || newData.val() === 'atteso')" },
+          "completato": { ".validate": "newData.isBoolean()" },
+          "t": { ".validate": "newData.isNumber() && newData.val() <= now + 60000" },
+          "$altro": { ".validate": false }
+        }
+      },
+      "cursori": {
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.hasChildren(['x', 'y', 't'])",
+          "x": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1" },
+          "y": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1" },
+          "t": { ".validate": "newData.isNumber() && newData.val() <= now + 60000" },
+          "$altro": { ".validate": false }
+        }
+      },
+      "$altro": { ".validate": false }
+    }
+  }
+}
