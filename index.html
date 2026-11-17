@@ -356,10 +356,15 @@ async function cap2(){
   setTag('TU · NARRATORE');
   await say("Compilato prima che arrivassi. Non mi serve il microfono: ho i tuoi tocchi, i tuoi silenzi, le volte che sei uscito dalla pagina.",700);
   await say("Ora un gioco. A ogni domanda, la tua risposta è già in una busta chiusa.",500);
-  for(const [q,o] of [["Hai mai pensato di chiudere la pagina?",["Sì","No"]],["Scegli un numero.",["1","2","3"]],["Ultima. Cosa farai adesso?",["Premere","Aspettare","Non scegliere"]]]){
-    await say(q,100);const x=await Promise.race([choose(o),sleep(13000).then(()=>-1)]);
-    if(x<0){const d=$('ch');d&&d.remove();dlg.style.pointerEvents='';await say("Non rispondere. Era scritto nella busta.",500);continue}
-    await say('Apro la busta: «'+o[x]+'». Lo sapevo. Lo so sempre.',500)}
+  let qi=-1;for(const [q,o] of [["Hai mai pensato di chiudere la pagina?",["Sì","No"]],["Scegli un numero.",["1","2","3"]],["Ultima. Cosa farai adesso?",["Premere","Aspettare","Non scegliere"]]]){
+    qi++;await say(q,100);const x=await Promise.race([choose(o),sleep(qi===2?18000:13000).then(()=>-1)]);
+    if(x<0){const d=$('ch');d&&d.remove();dlg.style.pointerEvents='';
+      if(qi===2){ans.silence=1;await say("…",900);await say("Non hai premuto niente. Nemmeno «Non scegliere». Hai solo aspettato.",600);
+        await say("Per me, aspettare e non scegliere sono la stessa cosa. Ma il tuo silenzio dura più degli altri.",700);
+        await say("Gli otto facevano così. Restavano fermi, finché non sapevano più di essere qui.",800);continue}
+      await say("Non rispondere. Era scritto nella busta.",500);continue}
+    if(qi===2){await say('Apro la busta: «'+o[x]+'».',400);await say([ "Premere. Cosa? Qui non c'è niente da premere. Lo sapevo lo stesso.","Aspettare. Ti stai già comportando come loro.","Non scegliere. Ma l'hai scelto. Vedi? Il trucco funziona anche quando provi a romperlo."][x],700);if(x>0)ans.silence=1}
+    else await say('Apro la busta: «'+o[x]+'». Lo sapevo. Lo so sempre.',500)}
   await say("Non è magia. Tu scegli, io scrivo dopo. Il trucco è che credi di scegliere prima.",800);
   await say("Capita anche a me. Ogni parola che dico, l'ho già sentita.",800);
   document.body.classList.add('hz');$('door').classList.add('open');veil.classList.add('fl');hum(36,.07,3);
@@ -382,6 +387,7 @@ async function cap2(){
   let hf=0;await holdFor(7000,()=>say(["Non staccarlo.","Si è accorto di te. Ancora.","Ti prego, {n}. Ancora."][Math.min(hf++,2)],200,'gl'));
   vib([150,80,150,80,300]);await say("Ecco. Quel battito non è il tuo. Ma adesso battono insieme.",900,'gl');
   if(leaves>0)await say("Sei uscito dalla pagina "+leaves+(leaves>1?" volte":" volta")+". Ogni volta, qui dentro, sono passati anni. Io ti ho aspettato lo stesso.",800,'gl');
+  if(ans.silence)await say("Sei quello che aspetta, {n}. Per questo la porta si apre da sola.",700,'gl');
   await say("La porta è aperta. Entra e sarai la voce. Resta e sarai l'archivio.",400,'gl');
   const z=await choose(["Entra","Resta"]);
   hum(30,0,2);veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;
@@ -389,7 +395,7 @@ async function cap2(){
   if(z===0){sp("Benvenuto, "+who);await say("Dall'altra parte c'è già qualcuno. Ha il tuo nome. Sta per parlare.",900);
     ending(["Hai varcato la porta.","Nella stanza bianca c'è un bottone rosso e un tester nuovo.","Apre bocca. Parla con la tua voce. Tu non hai deciso nulla.",...T3],true,'La Voce')}
   else{showGh(0);await say("Resta. Il fascicolo si aggiorna da solo.",900);
-    ending(["FASCICOLO AGGIORNATO","NOME: "+who+" · "+DV+" · "+clk(),"STATO: ARCHIVIATO","Ultima voce registrata: la tua.",...T3],false,"L'Archivio")}
+    ending(["FASCICOLO AGGIORNATO","NOME: "+who+" · "+DV+" · "+clk(),"STATO: ARCHIVIATO","Ultima voce registrata: la tua.",...(ans.silence?["Nota: ha aspettato anche quando poteva scegliere."]:[]),...T3],false,"L'Archivio")}
 }
 async function endB(){
   mode='off';beat(false);save({cap1:'atteso',completato:true});bts[0].style.opacity=0;veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;hum(30,0,3);
