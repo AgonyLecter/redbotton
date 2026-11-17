@@ -110,8 +110,10 @@ DV=/iPhone/.test(UA)?'iPhone':/iPad/.test(UA)||(/Macintosh/.test(UA)&&navigator.
 vis=Math.max(0,parseInt(localStorage.sp_v)||0),vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};localStorage.sp_v=vis+1;
 /* ultima visita: salvata come millisecondi, aggiornata mentre giochi e quando esci; valori assurdi vengono scartati */
 const NOW0=Date.now(),L0=parseInt(localStorage.sp_last,10),last=Number.isFinite(L0)&&L0>1.5e12&&L0<=NOW0+6e4&&NOW0-L0<3.2e10?Math.min(L0,NOW0):0;
-let wiped=0,trail=[],trT=0;const trStr=a=>a.map(p=>p[0]+','+p[1]).join(';');
-const stamp=()=>{if(wiped)return;try{localStorage.sp_last=String(Date.now());if(trail.length>40)localStorage.sp_trail=trStr(trail)}catch(e){}};stamp();setInterval(stamp,15000);addEventListener('pagehide',stamp);
+let wiped=0,trail=[],trT=0,quietVis=0;const TIME0=Math.max(0,parseInt(localStorage.sp_time)||0);let secs=0;
+setInterval(()=>{if(t0&&!document.hidden&&!wiped)secs++},1000);
+const played=()=>TIME0+secs,mins=x=>{const m=Math.round(x/60);return m<1?'meno di un minuto':m===1?'un minuto':m+' minuti'};const trStr=a=>a.map(p=>p[0]+','+p[1]).join(';');
+const stamp=()=>{if(wiped)return;try{localStorage.sp_last=String(Date.now());if(secs)localStorage.sp_time=String(played());if(trail.length>40)localStorage.sp_trail=trStr(trail)}catch(e){}};stamp();setInterval(stamp,15000);addEventListener('pagehide',stamp);
 const ago=()=>{if(!last)return '';const s=Math.max(0,(NOW0-last)/1000),m=s/60;const u=(x,a,b)=>x+' '+(x===1?a:b);
   return s<60?'pochi secondi':m<60?u(Math.max(1,Math.round(m)),'minuto','minuti'):m<1440?u(Math.round(m/60),'ora','ore'):u(Math.round(m/1440),'giorno','giorni')};
 const esc=x=>String(x).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
@@ -469,7 +471,7 @@ addEventListener('pointerdown',e=>{touchAt(e.clientX,e.clientY);if(mode==='off'|
   if(mode==='dodge'){const nb=bts.find(b=>Math.hypot(b._x-e.clientX,b._y-e.clientY)<Math.max(130,b._r*1.8));if(nb)return flee(nb,e.clientX,e.clientY)}
   P.empty++});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){P.blurAt=Date.now();return}
-  if(P.blurAt&&mode!=='off'){const s=Math.round((Date.now()-P.blurAt)/1000);P.blurAt=0;
+  if(P.blurAt&&mode!=='off'&&!quietVis){const s=Math.round((Date.now()-P.blurAt)/1000);P.blurAt=0;
     if(s>=3)say(mode==='final'?"Sei tornato. Non andartene più.":`Sei tornato. Eri via da ${s} secondi. Io sono rimasto qui, al buio.`,400,document.body.classList.contains('hz')?'gl':'')}});
 setInterval(()=>{if(mode==='off'||mode==='final'||mode==='still'||mode==='walk')return;const n=Date.now(),idle=n-P.last;if(n-lastR<4500)return;
   const R=t=>{lastR=n;P.last=n;say(t,300)};
@@ -624,7 +626,7 @@ async function cap1(){
     if(Math.random()<.35){showFig(50+Math.sin(e/2100)*22,.8+e/40000*2.1);if(Math.random()<.5)S.step()}if(e>40000)break}
   if(!pressed)endB();
 }
-async function ending(lines,light,k){const E=JSON.parse(localStorage.sp_e||'[]');if(!E.includes(k)){E.push(k);localStorage.sp_e=JSON.stringify(E)}lines=[...lines.slice(0,-1),'FINALE «'+k+'» · TROVATI '+E.length+' SU 6',...lines.slice(-1)];const e=$('end');if(light){e.style.background='#fff';e.style.color='#333'}e.style.display='flex';e.style.opacity=0;e.style.transition='opacity 4s';
+async function ending(lines,light,k){const E=JSON.parse(localStorage.sp_e||'[]');if(!E.includes(k)){E.push(k);localStorage.sp_e=JSON.stringify(E)}lines=[...lines.slice(0,-1),'FINALE «'+k+'» · TROVATI '+E.length+' SU '+NE,...lines.slice(-1)];const e=$('end');if(light){e.style.background='#fff';e.style.color='#333'}e.style.display='flex';e.style.opacity=0;e.style.transition='opacity 4s';
   requestAnimationFrame(()=>e.style.opacity=1);await sleep(4300);dlg.style.opacity=0;for(const l of lines){$('elog').innerHTML+=esc(l)+'<br>';await sleep(1800)}$('ebtn').style.opacity=1}
 async function press(b){
   mode='off';sw=0;pressed=true;beat(false);b.classList.add('pressed');S.click();setTimeout(S.thud,150);room.classList.add('shake');save({cap1:'premuto',completato:true});await sleep(1000);
@@ -834,18 +836,140 @@ async function cap3(){
   else if(gl2)await say("Di solito qui ti mostrerei i movimenti veri di chi è passato prima di te. Ma non c'è nessuno. Sei il primo ad arrivare fin qui.",900,'gl');
   else await say("Volevo mostrarti i movimenti veri degli altri giocatori, ma non riesco a raggiungerli. Sei offline, oppure fuori non c'è più niente.",900,'gl');
   await say("Adesso scegli. Puoi lasciare qui il tuo movimento: chi giocherà dopo di te vedrà il tuo dito muoversi, con l'ora e il numero di tester. Mai il tuo nome.",300,'gl');
-  await say("Oppure puoi dimenticare. «Dimentica» cancella davvero i tuoi salvataggi su questo dispositivo: nome, capitoli, finali. Il gioco non saprà più chi sei. Non è una metafora.",200,'gl');
-  const z=await choose(["Lascia il mio segno","Dimentica tutto"]);if(stop)stop();
+  await say("Oppure puoi chiedere di uscire. Ma attento, {n}: qui dentro le richieste si sentono. Tutte.",200,'gl');
+  const z=await choose(["Lascia il mio segno","Voglio uscire"]);if(stop)stop();
   if(z===0){let ok=false;const tr=trail.length>40?trail:mine;
     if(db&&auid&&tr.length>20){try{await Promise.race([fb.set(fb.ref(db,'stanza/fantasmi/'+auid),{p:trStr(tr.slice(-250)),t:fb.serverTimestamp(),h:clk(),n:String(tester).replace(/\D/g,'').slice(0,6).padStart(4,'0')}),sleep(6000).then(()=>{throw 0})]);ok=true}catch(e){}}
     await say(ok?"Fatto. Il tuo dito è uscito da qui. Adesso si muove nel capitolo 3 di qualcun altro.":"Non sono riuscito a portarti fuori. Il tuo segno resta solo qui, in questo dispositivo.",900,'gl');
     await say("Grazie, {n}. Adesso ho anche il modo in cui esiti. Mi manca solo una faccia.",900,'gl');
     await jumpscare();
-    ending(ok?["IL TUO MOVIMENTO È STATO SALVATO","Qualcuno, da qualche parte, lo vedrà muoversi alle "+clk()+".","Non saprà chi eri. Vedrà solo come esitavi.","","FINE CAPITOLO 3 · SENZA VOLTO"]:["IL TUO MOVIMENTO È RIMASTO QUI","Nessuno lo vedrà. Solo tu, e io.","","FINE CAPITOLO 3 · SENZA VOLTO"],false,'Il Segno')}
-  else{await say("Va bene. Ti tolgo il nome. Ti tolgo la faccia. Poi ti lascio andare.",900,'gl');
+    ending(ok?["IL TUO MOVIMENTO È STATO SALVATO","Qualcuno, da qualche parte, lo vedrà muoversi alle "+clk()+".","Non saprà chi eri. Vedrà solo come esitavi.","","FINE CAPITOLO 3 · SENZA VOLTO","CAPITOLO 4 · SBLOCCATO"]:["IL TUO MOVIMENTO È RIMASTO QUI","Nessuno lo vedrà. Solo tu, e io.","","FINE CAPITOLO 3 · SENZA VOLTO","CAPITOLO 4 · SBLOCCATO"],false,'Il Segno')}
+  else{await say("Uscire.",900,'gl');await say("L'hai detto ad alta voce. Qualcuno l'ha sentito. E non ero io.",900,'gl');
+    await say("Il narratore è tornato, {n}. Non gli piace quando qualcuno chiede l'uscita. La prende sul personale.",900,'gl');
+    await jumpscare();
+    ending(["HAI CHIESTO DI USCIRE","La richiesta è stata registrata.","Il narratore la sta leggendo adesso.","","FINE CAPITOLO 3 · SENZA VOLTO","CAPITOLO 4 · SBLOCCATO"],false,'La Fuga')}
+}
+/* ===== CAPITOLO 4 · L'Uscita =====
+   Il narratore è tornato e racconta in terza persona quello che fai DAVVERO, mentre lo fai.
+   Il gioco finge di finire, finge un menù, finge di chiudersi. Poi ti chiede di andartene sul serio. */
+let fsOK=0;document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&fsOK&&t0){fsOK=0;say("Hai tolto lo schermo intero. Non cambia niente: la stanza non è nello schermo.",300,'gl')}});
+const grabFS=()=>{try{const el=document.documentElement;if(!document.fullscreenElement&&el.requestFullscreen)return el.requestFullscreen().then(()=>{fsOK=1;return 1}).catch(()=>0)}catch(e){}return Promise.resolve(0)};
+async function narrateLive(ms){const t1=Date.now();let lx=P.mx,ly=P.my,lt=P.taps,ll=leaves,lastL=0,saidT=0;const said=new Set();
+  const once=(k,t)=>{if(said.has(k))return null;said.add(k);return t};
+  coach('drag','FAI QUELLO CHE VUOI · LUI LO RACCONTA');
+  while(Date.now()-t1<ms){await sleep(400);const n=Date.now();if(busy||n-lastL<4200)continue;let line=null;
+    const dx=P.mx-lx,dy=P.my-ly,idle=n-P.last;
+    if(leaves>ll){ll=leaves;line="{n} uscì dalla pagina. Per qualche secondo il gioco rimase solo. Poi {n} tornò. Tornano sempre."}
+    else if(P.taps-lt>=3){line="{n} toccò lo schermo "+(P.taps-lt)+" volte. Non successe niente. Continuò lo stesso, come si bussa a una porta murata.";lt=P.taps}
+    else if(P.taps>lt){line=once('tap',"{n} toccò lo schermo. Una volta sola. Voleva vedere se qualcuno rispondeva.");lt=P.taps}
+    else if(idle>6000)line=said.has('idle')?once('idle2',"{n} rimase ancora immobile. Fuori dallo schermo, forse, qualcosa si muoveva al posto suo."):once('idle',"{n} non fece niente. Sperava che, se restava fermo, non sarebbe successo niente.");
+    else if(Math.abs(dx)>innerWidth*.25)line=once(dx<0?'l':'r',"{n} spostò il dito verso "+(dx<0?"sinistra":"destra")+". Da quella parte non c'era nessuna uscita. Lo sapeva, ma ci provò lo stesso.");
+    else if(Math.abs(dy)>innerHeight*.25)line=once(dy<0?'u':'d',dy<0?"{n} portò il dito in alto, verso il bordo dello schermo. Come chi cerca la maniglia.":"{n} abbassò il dito. Lo sguardo, probabilmente, lo seguì.");
+    else if(!saidT&&n-t1>9000){saidT=1;const hh=(new Date).getHours();line="Erano le "+clk()+". "+(hh>=23||hh<6?"{n} avrebbe dovuto dormire. Invece era qui.":"{n} avrebbe potuto essere ovunque. Invece era qui.")}
+    if(!line&&n-lastL>9000&&n-t1>6000)line=once('w',"{n} aspettava che succedesse qualcosa. Il narratore aspettava che {n} facesse qualcosa. Rimasero così, tutti e due, a guardarsi attraverso il vetro.");
+    if(line){lastL=n;lx=P.mx;ly=P.my;await say(line,300)}}
+  coach()}
+async function credits(n){const c=document.createElement('div');c.style.cssText='position:fixed;inset:0;background:#000;z-index:45;overflow:hidden;opacity:0;transition:opacity 2s;color:#ddd;font:15px/2.4 Georgia,serif;text-align:center;letter-spacing:.2em';
+  const L=['IL BOTTONE ROSSO','','un test di obbedienza','','','NARRATORE','sé stesso','','OSPITE','senza volto','','TESTER #0001','il primo a premere','','TESTER #'+tester,n,'','','GRAZIE PER AVER GIOCATO','','','','TESTER #'+tester,n+' · ancora qui'];
+  const inner=document.createElement('div');inner.style.cssText='position:absolute;left:0;right:0;top:100%';L.forEach(t=>{const d=document.createElement('div');d.textContent=t||' ';inner.append(d)});c.append(inner);document.body.append(c);
+  requestAnimationFrame(()=>c.style.opacity=1);hum(55,.02,3);let y=0;const H=inner.scrollHeight+innerHeight;
+  for(let i=0;i<300;i++){await sleep(40);y+=2.2;inner.style.transform='translateY('+(-y)+'px)';if(y>H*.62)break}
+  S.glitch();vib(80);for(let i=0;i<6;i++){inner.style.transform='translate('+rnd(-8,8)+'px,'+(-y+rnd(-5,5))+'px)';await sleep(70)}
+  inner.lastChild.style.color='#f33';await sleep(2600);return()=>{c.style.opacity=0;setTimeout(()=>c.remove(),2100)}}
+function fakeMenu(){return new Promise(r=>{const st=$('start');st.style.display='flex';$('mq').textContent='Grazie per aver giocato.';$('mq').style.opacity=1;
+  mn.innerHTML='<a id="fr">Riprendi</a><a id="fq">Esci dal gioco</a>';
+  $('fr').onclick=()=>{S.ok();st.style.display='none';r(0)};$('fq').onclick=()=>{S.ok();st.style.display='none';r(1)}})}
+async function waitLeave(ms){quietVis=1;const t1=Date.now();let away=0,hid=0,back=0;
+  const h=()=>{if(document.hidden){hid=Date.now()}else if(hid){away+=Date.now()-hid;back=1}};document.addEventListener('visibilitychange',h);
+  while(Date.now()-t1<ms&&!back)await sleep(200);
+  while(document.hidden)await sleep(300);
+  document.removeEventListener('visibilitychange',h);quietVis=0;return{left:back,secs:Math.max(1,Math.round(away/1000))}}
+async function cap4(){
+  who=localStorage.sp_name||'Tester';tester=localStorage.sp_t||'0000';t0=Date.now();camZ=camZT=CZ;eyeY=EY;hum(50,.025,4);
+  await card('CAPITOLO 4<br><small style="letter-spacing:.18em;opacity:.55;font-size:.8em">L\'USCITA</small>');
+  setTag('NARRATORE');
+  await say("Bentornato, {n}. Sì. Sono di nuovo io.",600);
+  await say("Quello senza volto mi ha prestato la voce. O forse gliel'avevo prestata io. A un certo punto smetti di tenere il conto.",700);
+  if(HAS('La Fuga'))await say("Mi hanno detto che hai chiesto di uscire. Ad alta voce. Davanti a lui. È stato… imbarazzante. Per tutti e due.",800);
+  else await say("Hai lasciato il tuo dito agli altri. Generoso. Io non l'avrei fatto. Io tengo tutto.",800);
+  await say("Facciamo una cosa diversa. Niente prove, niente bottoni da inseguire. Ti sei già stancato di quelle, si vedeva.",700);
+  await say("Questa volta tu fai. E io racconto. Da questo momento, ogni cosa che fai diventa una mia frase.",300);
+  await narrateLive(38000);
+  await say("Hai visto? Qualunque cosa tu faccia, la scrivo io. Anche niente, lo scrivo.",700);
+  await say("È così che funziona una storia, {n}. Non puoi uscirne. Puoi solo cambiare le parole.",800);
+  /* la scelta già scritta */
+  await say("Facciamo una prova. Adesso {n} sceglierà «Sinistra».",100);
+  let c=await choose(["Sinistra","Destra"]);
+  if(c===0)await say("{n} scelse «Sinistra», esattamente come era scritto. Non ti senti un po' meno libero, adesso?",800);
+  else{await redo("{n} scelse «Destra».","No. Rileggi meglio.");await say("Adesso {n} sceglierà «Sinistra».",100);
+    c=await choose(["Sinistra","Sinistra"]);await say("{n} scelse «Sinistra». Vedi quanto è facile? Mi basta riscrivere le opzioni. Le tue scelte sono solo bottoni che preparo io.",900)}
+  const fs=await grabFS();if(fs)await say("Ah, e intanto mi sono preso tutto lo schermo. Non te ne sei accorto, vero? Era nascosto nel tuo ultimo tocco.",700);
+  await say("Va bene. Hai vinto tu. Ti lascio andare. Davvero.",1400);
+  dlg.style.opacity=0;await sleep(800);const close=await credits(who);
+  await say("…",900,'gl');await say("Ci hai creduto, vero? Per un secondo. Lo sento quando ci credete: il dito si stacca dallo schermo.",900,'gl');close();await sleep(2400);
+  /* il menù finto: nella stanza bianca, laggiù, c'è lui */
+  document.body.classList.remove('hz');veil.style.opacity=0;showFig(72,1.25);dlg.style.opacity=0;
+  const m=await fakeMenu();showFig();
+  if(m===0)await say("Riprendi? Riprendere cosa? Non ti sei mai fermato. Non te l'ho mai permesso.",900);
+  else{const e=$('card');e.innerHTML='<span style="font:13px ui-monospace,monospace;letter-spacing:.1em;color:#888">il gioco è stato chiuso</span>';e.style.opacity=1;hum(30,0,.3);await sleep(4500);
+    e.innerHTML='';await sleep(1200);e.style.opacity=0;await sleep(900);
+    await say("Il gioco non si chiude dall'interno, {n}. Quello era un menù che ho disegnato io. Anche il pulsante «Esci». Soprattutto quello.",900,'gl')}
+  /* la vera uscita */
+  await say("Vuoi sapere la verità? Una porta vera c'è. È sempre stata lì. Non è nel gioco: è fuori.",700);
+  await say("Chiudi questa pagina. Oppure cambia app. Adesso. Nessuno ti trattiene.",200);
+  await say("Io resto qui. Ti aspetto. Vediamo chi dei due si stanca prima.",200);
+  coach('still','PUOI ANDARTENE DAVVERO');const w=await waitLeave(25000);coach();
+  if(w.left){await say("Sei tornato.",1200);await say("Sei stato via "+w.secs+" second"+(w.secs===1?"o":"i")+". Li ho contati tutti, al buio.",800);
+    await say("Avevi la porta aperta, {n}. L'hai usata. E poi sei rientrato da solo. Io non ho fatto niente. Ricordatelo.",900);
+    ending(["SEI USCITO","SEI RIENTRATO","Nessuno ti ha costretto.","Questo è il dettaglio che il narratore preferisce.","","FINE CAPITOLO 4 · L'USCITA","CAPITOLO 5 · SBLOCCATO"],false,'Il Ritorno')}
+  else{await say("Non l'hai fatto.",1200);await say("Venticinque secondi. Avevi una porta vera e non l'hai toccata.",800);
+    await say("Nessuno ti tratteneva, {n}. Non io, non lui. Solo tu. È la prima cosa davvero tua che fai qui dentro.",900);
+    ending(["SEI RIMASTO","La porta era aperta.","La pagina si poteva chiudere.","Il narratore non ha dovuto fare niente.","","FINE CAPITOLO 4 · L'USCITA","CAPITOLO 5 · SBLOCCATO"],false,'La Resa')}
+}
+/* ===== CAPITOLO 5 · Casa =====
+   Il gioco ti mostra solo cose vere: il tempo reale passato qui, le visite, i finali trovati, i tuoi gesti, la tua confessione.
+   Poi l'ultima scelta: premere, restare per sempre (il menù cambia per sempre), o dimenticare (cancellazione vera). */
+async function cap5(){
+  who=localStorage.sp_name||'Tester';tester=localStorage.sp_t||'0000';t0=Date.now();camZ=camZT=CZ;eyeY=EY;hum(46,.025,4);
+  await card('CAPITOLO 5<br><small style="letter-spacing:.18em;opacity:.55;font-size:.8em">CASA</small>');
+  setTag('NARRATORE');
+  await say("Ti ricordi la prima frase che ti ho detto?",900);
+  await say("«Benvenuto. Accomodati pure, non c'è fretta.»",1200);
+  await say("Non c'era fretta perché sapevo che saresti rimasto.",900);
+  const E=ENDS(),tot=played();
+  await say("Ti dico un numero. Questo non è un trucco, non è una frase scritta prima: è vero. Hai passato qui dentro "+mins(tot)+", in "+(vis+1)+" visite.",900);
+  await say(tot>1800?"Più di mezz'ora della tua vita. Non te la restituisco.":tot>900?"Un quarto d'ora abbondante. Il tempo di una telefonata che non hai fatto.":"Poco, dirai. Ma ogni secondo l'hai scelto tu.",800);
+  await say("Hai trovato "+E.length+" finali su "+NE+": "+E.join(", ")+". Ogni finale era una porta dipinta sul muro. Li hai provati tutti, cercando quella vera.",1000);
+  if(localStorage.sp_conf)await say("Nel capitolo uno mi hai scritto una cosa che non avevi mai detto a nessuno: «"+localStorage.sp_conf+"». È ancora qui. Io non dimentico niente.",1000);
+  /* il tuo fantasma */
+  const mine=parseTr(localStorage.sp_trail);let stop=null;
+  if(mine.length>20){stop=showGhosts([{pt:mine,t:Date.now()-tot*1000,h:clk(),n:String(tester).replace(/\D/g,'').slice(0,6)}]);
+    await say("Quel cursore lì sei tu. Non un altro giocatore: proprio tu, registrato mentre giocavi. Guardalo esitare. Lo riconosci?",1000)}
+  await say("Adesso ti dico chi sono.",900);
+  await say("Non sono un narratore. Non sono un tester. Sono il tempo che mi hai dato. Ogni minuto che passi qui mi regala una frase in più.",1000);
+  await say("Il primo tester non ha premuto nessun bottone. Ha solo continuato a giocare. Poi a giocare. Poi non si è più alzato.",1000);
+  if(stop)stop();
+  /* l'ultima camminata: come nel capitolo uno */
+  const b0=mk(innerWidth/2,innerHeight*.66);b0.wx=b0.g.position.x=0;b0.wz=-5;b0.g.position.z=-5;
+  await say("Il bottone è laggiù. Lo stesso dell'inizio. Questa volta non scappa. Te lo prometto, ed è l'unica promessa vera che ti ho fatto.",300);
+  mode='walk';let steps=0;const stepH=e=>{if(e.target.closest('#dlg,.ov')||camZT<=.7)return;camZT-=1.2;steps++;S.step();coachP(steps/4)};
+  addEventListener('pointerdown',stepH);coach('tap',TAP()+' LO SCHERMO PER AVVICINARTI',0);
+  await until(()=>camZT<=.7,["Un passo alla volta. Come la prima volta.","Non ti chiedo di premerlo. Ti chiedo solo di avvicinarti."],()=>[innerWidth/2,innerHeight*.55]);
+  removeEventListener('pointerdown',stepH);coach();mode='off';await sleep(900);
+  await say("Eccoci. Adesso puoi fare tre cose. Tutte e tre sono vere. Nessuna è scritta da me.",300);
+  await say("Puoi premerlo, e il gioco finisce davvero. Puoi restare, e questa diventa casa tua: il gioco non sarà più lo stesso, nemmeno il menù. Oppure puoi dimenticare: cancello davvero tutto quello che so di te su questo dispositivo.",200);
+  const z=await choose(["Premi il bottone","Resta","Dimentica tutto"]);
+  if(z===0){b0.classList.add('pressed');S.click();setTimeout(S.thud,150);
+    await say("Click.",1400);await say("Era proprio così. Il rumore del click.",900);await say("Grazie, {n}. Questa volta non prendi il posto di nessuno. Puoi andare. La porta è quella vera: lo schermo che si spegne.",1000);
+    ending(["IL BOTTONE È STATO PREMUTO","Il test è concluso.","Hai passato qui "+mins(played())+".","Fuori, nel frattempo, il mondo è andato avanti senza di te.","Raggiungilo.","","FINE · IL BOTTONE ROSSO"],true,"L'Ultimo Click")}
+  else if(z===1){try{localStorage.sp_home='1'}catch(e){}
+    await say("Resti.",1200);await say("Allora questa è casa tua. Da adesso, quando aprirai il gioco, il menù ti chiamerà per nome. Non è un modo di dire: succederà davvero.",900);
+    await say("E anche lui resta. Siamo una famiglia, adesso.",400,'gl');await jumpscare();
+    ending(["BENVENUTO A CASA, "+who.toUpperCase(),"Il menù è cambiato.","Il bottone non scappa più.","Non serve più.","","FINE · IL BOTTONE ROSSO"],false,'La Casa')}
+  else{await say("Va bene. Ti tolgo il nome. Ti tolgo il tempo. Ti tolgo la faccia.",900,'gl');
     if(db&&auid){try{fb.remove(fb.ref(db,'stanza/giocatori/'+auid));fb.remove(fb.ref(db,'stanza/fantasmi/'+auid))}catch(e){}}
     await jumpscare();
-    await ending(["MEMORIA CANCELLATA","Nome, capitoli e finali sono stati cancellati da questo dispositivo.","La prossima volta che entri, nessuno ti riconoscerà.","Nemmeno tu sarai sicuro di essere già stato qui.","","FINE CAPITOLO 3 · SENZA VOLTO"],false,"L'Oblio");
+    await ending(["MEMORIA CANCELLATA","Nome, tempo, capitoli e finali sono stati cancellati da questo dispositivo.","La prossima volta che entri, nessuno ti riconoscerà.","Nemmeno tu sarai sicuro di essere già stato qui.","","FINE · IL BOTTONE ROSSO"],false,"L'Oblio");
     wiped=1;try{Object.keys(localStorage).filter(k=>k.startsWith('sp_')).forEach(k=>localStorage.removeItem(k))}catch(e){}}
 }
 /* ===== Extra: bivio, ripensamento, crash, memoria ===== */
@@ -863,15 +987,20 @@ async function endB(){
   ending(["ESITO: NESSUNO","Il test non è mai finito.","Nella stanza c'è un cursore in più. Il suo nome era "+who+".","Ora aspetta, insieme agli altri.","TESTER #"+tester+" · SESSIONE IN CORSO","","FINE CAPITOLO 1 · IL TEST DI ACCETTAZIONE"],false,'La Compagnia');
 }
 const mq=$('mq'),mn=$('mn'),MQ=["Non hai ancora iniziato e già mi fai aspettare.","Il bottone è lì, a destra. Fa finta di niente.","Puoi restare nel menù quanto vuoi. Io ho tempo. Troppo.","Tutti iniziano. Pochissimi finiscono. Nessuno ricorda come.","Se senti dei passi, è la ventilazione. Probabilmente."];let mqi=0;if(vis>0&&last)MQ.unshift('L\'ultima volta sei andato via '+ago()+' fa. Non ti ho dimenticato.');if(JSON.parse(localStorage.sp_e||'[]').length)MQ.push('So come sei finito l\'ultima volta. Tu lo ricordi?');
+const HOME=localStorage.sp_home==='1';if(HOME){MQ.length=0;MQ.push('Bentornato a casa, '+(localStorage.sp_name||'tester')+'.','La tua stanza è come l\'hai lasciata.','Lui ha tenuto il tuo posto.','Non c\'è fretta. Non c\'è mai stata.');const h1=document.querySelector('#mt h1');h1.textContent=(localStorage.sp_name||'TESTER').toUpperCase();document.querySelector('#mt small').textContent='CASA'}
 const mqs=()=>{mq.style.opacity=0;setTimeout(()=>{mq.textContent=MQ[mqi++%MQ.length];mq.style.opacity=1},500)};mqs();const mqt=setInterval(mqs,7000);
 mk(innerWidth*.74,innerHeight*.7);
 const T0=document.title;document.addEventListener('visibilitychange',()=>{document.title=document.hidden&&t0?['Dove vai?','Torna qui.',who+'...','Ti aspetto.'][Math.floor(Math.random()*4)]:T0});
 addEventListener('offline',()=>t0&&say("Hai tolto la connessione. Credi che serva? Sono già dentro.",300,'gl'));
 matchMedia('(orientation:portrait)').addEventListener('change',()=>t0&&say("Hai girato lo schermo. Cerchi un'altra angolazione? Non ce n'è.",300,'gl'));
 const begin=async f=>{history.pushState(null,'');addEventListener('popstate',()=>{history.pushState(null,'');t0&&say("Indietro non esiste, {n}.",300,'gl')});clearInterval(mqt);$('start').style.display='none';bts.forEach(b=>b.remove());bts=[];AC();S.ok();await initFB();presence();(typeof f==='function'?f:cap1)()};
-function menu(){mn.innerHTML='<a id="go">Inizia il test</a><a id="chs">Capitoli</a><a id="snd">Audio: '+(muted?'spento':'attivo')+'</a>';$('go').onclick=()=>begin();$('chs').onclick=chap;$('snd').onclick=()=>{muted=!muted;if(mg)mg.gain.value=muted?0:1;menu()}}
-const E3=()=>{const E=JSON.parse(localStorage.sp_e||'[]');return E.includes('La Voce')||E.includes("L'Archivio")};
-function chap(){mn.innerHTML='<a id="c1">Capitolo 1 · Il Test di Accettazione</a>'+(JSON.parse(localStorage.sp_e||'[]').length?'<a id="c2">Capitolo 2 · L\'Archivio dei Cursori</a>':'<a class="lk">Capitolo 2 · finisci il capitolo 1</a>')+(E3()?'<a id="c3">Capitolo 3 · Senza Volto</a>':'<a class="lk">Capitolo 3 · finisci il capitolo 2</a>')+'<a id="bk">← Indietro</a>';$('c1').onclick=()=>begin();if($('c2'))$('c2').onclick=()=>begin(cap2);if($('c3'))$('c3').onclick=()=>begin(cap3);$('bk').onclick=menu}
+function menu(){mn.innerHTML='<a id="go">'+(HOME?'Torna dentro':'Inizia il test')+'</a><a id="chs">Capitoli</a><a id="snd">Audio: '+(muted?'spento':'attivo')+'</a>';$('go').onclick=()=>begin();$('chs').onclick=chap;$('snd').onclick=()=>{muted=!muted;if(mg)mg.gain.value=muted?0:1;menu()}}
+const NE=11,ENDS=()=>{try{return JSON.parse(localStorage.sp_e||'[]')}catch(e){return[]}},HAS=(...k)=>k.some(x=>ENDS().includes(x));
+const CHS=[['Capitolo 1 · Il Test di Accettazione',()=>1,()=>cap1,''],["Capitolo 2 · L'Archivio dei Cursori",()=>ENDS().length>0,()=>cap2,'finisci il capitolo 1'],
+  ['Capitolo 3 · Senza Volto',()=>HAS('La Voce',"L'Archivio"),()=>cap3,'finisci il capitolo 2'],["Capitolo 4 · L'Uscita",()=>HAS('Il Segno','La Fuga'),()=>cap4,'finisci il capitolo 3'],
+  ['Capitolo 5 · Casa',()=>HAS('Il Ritorno','La Resa'),()=>cap5,'finisci il capitolo 4']];
+function chap(){mn.innerHTML=CHS.map(([t,u,f,h],i)=>u()?'<a data-c="'+i+'">'+t+'</a>':'<a class="lk">'+t.split(' · ')[0]+' · '+h+'</a>').join('')+'<a id="bk">← Indietro</a>';
+  mn.querySelectorAll('a[data-c]').forEach(a=>a.onclick=()=>begin(CHS[+a.dataset.c][2]()));$('bk').onclick=menu}
 menu();
 </script>
 </body>
