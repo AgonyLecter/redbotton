@@ -2,195 +2,196 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<title>La Stanza Bianca</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Test di Accettazione</title>
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;height:100%;background:#fff;color:#222;font-family:Georgia,serif;overflow:hidden;touch-action:manipulation;user-select:none}
-#room{position:fixed;inset:0}
-.btn{position:absolute;width:92px;height:92px;border-radius:50%;transform:translate(-50%,-50%);cursor:pointer;
-background:radial-gradient(circle at 35% 30%,#ff7a7a,#d10000 70%);border:6px solid #8f0000;box-shadow:0 8px 0 #6e0000;
-transition:left .28s cubic-bezier(.3,1.6,.5,1),top .28s cubic-bezier(.3,1.6,.5,1),transform .12s,box-shadow .12s;animation:pop .3s}
-.btn.pressed{transform:translate(-50%,calc(-50% + 8px));box-shadow:0 0 0 #6e0000;cursor:default}
-@keyframes pop{from{opacity:0;scale:.2}to{opacity:1;scale:1}}
-.ghost{position:absolute;width:10px;height:10px;border-radius:50%;background:#c8c8c8;transform:translate(-50%,-50%);pointer-events:none}
-#ghosts{position:fixed;inset:0;pointer-events:none}
-#sub{position:fixed;left:50%;bottom:9%;transform:translateX(-50%);width:min(720px,90vw);text-align:center;font-size:clamp(1.05rem,3.6vw,1.45rem);
-line-height:1.45;min-height:3em;opacity:0;transition:opacity .4s;pointer-events:none}
-#sub.on{opacity:1}
-#hud{position:fixed;top:10px;right:12px;font:13px system-ui,sans-serif;color:#999;display:flex;gap:10px;align-items:center}
-#hud button{background:none;border:1px solid #ddd;border-radius:8px;padding:4px 8px;cursor:pointer;color:#666}
-.ov{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;z-index:5}
-.ov h1{font-weight:400;letter-spacing:.12em;margin:0;font-size:clamp(1.6rem,6vw,2.4rem)}
-.ov p{margin:0;color:#777;max-width:420px}
-.ov button.big{font:inherit;font-size:1.1rem;padding:12px 26px;border:2px solid #222;background:#fff;border-radius:6px;cursor:pointer}
-.ov button.big:disabled{border-color:#ddd;color:#bbb;cursor:default}
-#end{display:none}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;outline:none}
+html,body{margin:0;height:100%;overflow:hidden;background:#000;font-family:Georgia,serif;touch-action:none}
+#room{position:fixed;inset:0;overflow:hidden;background:linear-gradient(#fbfbfd,#ececf1 55%,#d9d9e0 55%,#c2c2cc)}
+#room:before{content:"";position:absolute;left:0;right:0;top:55%;bottom:0;box-shadow:0 -4px 10px rgba(0,0,0,.08);background:repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 1px,transparent 1px 90px)}
+#room:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(0,0,0,.3));pointer-events:none;z-index:9999}
+.btn{position:absolute;width:104px;height:90px;transform:translate(-50%,-85%) scale(var(--s,1));transform-origin:50% 90%;cursor:pointer;
+transition:left .3s cubic-bezier(.3,1.4,.5,1),top .3s cubic-bezier(.3,1.4,.5,1);animation:in .5s}
+@keyframes in{from{opacity:0}}
+.btn i{position:absolute;display:block}
+.sh{left:-8%;right:-8%;bottom:-10px;height:30px;background:rgba(0,0,0,.3);border-radius:50%;filter:blur(7px)}
+.bs{left:0;right:0;bottom:0;height:46px;border-radius:50%;background:radial-gradient(#6a6a6a,#1a1a1a)}
+.cp{left:9%;right:9%;bottom:15px;height:56px;border-radius:50%;background:radial-gradient(ellipse at 50% 28%,#ff9a9a,#e50000 55%,#a40000);box-shadow:0 12px 0 #720000;transition:transform .1s,box-shadow .1s}
+.btn.pressed .cp{transform:translateY(10px);box-shadow:0 2px 0 #720000}
+.btn.no{animation:no .3s}
+@keyframes no{25%{margin-left:-9px}75%{margin-left:9px}}
+#veil{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 1.5s;z-index:10}
+#veil.fl{opacity:1!important;transition:none;background:radial-gradient(circle 240px at var(--mx,50%) var(--my,50%),rgba(0,0,0,0),rgba(0,0,0,.95))}
+#gh{position:fixed;left:0;top:0;opacity:0;pointer-events:none;z-index:15;transition:opacity 2s}
+#hud{position:fixed;top:calc(10px + env(safe-area-inset-top));left:14px;font:11px/1.4 ui-monospace,monospace;letter-spacing:.12em;color:#8a8a95;z-index:20}
+body.hz #hud{color:#c33}
+#dlg{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(680px,calc(100vw - 24px));
+background:rgba(16,16,22,.9);color:#f2f2f5;border-radius:14px;padding:13px 18px 16px;backdrop-filter:blur(8px);box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;transition:opacity .3s;pointer-events:none;z-index:20}
+#tag{font:600 11px system-ui,sans-serif;letter-spacing:.2em;color:#9aa0b0;margin-bottom:6px}
+#tag:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#7c9;margin-right:8px;animation:bl 1.4s infinite}
+body.hz #tag:before{background:#e33}
+@keyframes bl{50%{opacity:.2}}
+#txt{font-size:clamp(1.02rem,3.8vw,1.2rem);line-height:1.5;min-height:3em}
+#txt.gl{color:#ff7b7b;animation:jit .13s infinite}
+@keyframes jit{50%{transform:translateX(1.5px)}}
+.ov{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;z-index:30}
+#start{background:#f7f7fa;color:#222}
+#start h1{font-weight:400;letter-spacing:.2em;margin:0;font-size:clamp(1.4rem,6vw,2.2rem)}
+#start p{margin:0;color:#777;max-width:380px;font-size:.95rem}
+.big{font:inherit;font-size:1.05rem;padding:12px 28px;border:2px solid currentColor;background:none;color:inherit;border-radius:8px;cursor:pointer}
+#end{display:none;background:#000;color:#9fd;font:14px/1.9 ui-monospace,monospace;z-index:40}
+#ebtn{opacity:0;transition:opacity 1s;color:#fff;font-family:inherit}
 </style>
 </head>
 <body>
 <div id="room"></div>
-<div id="ghosts"></div>
-<div id="sub"></div>
-<div id="hud"><span id="cnt"></span><button id="vbtn">🔇 Voce</button></div>
+<div id="veil"></div>
+<svg id="gh" width="22" height="22" viewBox="0 0 24 24"><path d="M3 2l17 8-7 2-3 7z" fill="#eee" stroke="#222" stroke-width="1.5"/></svg>
+<div id="hud"></div>
+<div id="dlg"><div id="tag">NARRATORE</div><div id="txt"></div></div>
 
 <div class="ov" id="start">
-  <h1>LA STANZA BIANCA</h1>
-  <p>C'è una stanza. C'è un bottone rosso. Ti basta premerlo.</p>
-  <button class="big" id="go">Capitolo 1 · La Stanza Bianca</button>
-  <button class="big" disabled>Capitolo 2 · 🔒 in arrivo</button>
-  <p style="font-size:.85rem">Consigliato: audio attivo. Il narratore può parlare (tasto Voce in alto a destra).</p>
+  <h1>TEST DI ACCETTAZIONE</h1>
+  <p>Stanza 1. Un solo compito: premere il bottone rosso. Il narratore parla solo a testo, quindi leggilo.</p>
+  <button class="big" id="go">Inizia il test</button>
 </div>
-<div class="ov" id="end">
-  <h1>FINE CAPITOLO 1</h1>
-  <p>Il bottone non era quello vero. Il capitolo 2 arriverà presto.</p>
-  <button class="big" onclick="location.reload()">Rigioca</button>
-</div>
+<div class="ov" id="end"><div id="elog"></div><button class="big" id="ebtn" onclick="location.reload()">Rigioca</button></div>
 
 <script type="module">
-/* ====== CONFIG FIREBASE: incolla qui i dati del tuo progetto ====== */
+/* ====== Firebase ====== */
 const FB={apiKey:"AIzaSyAkUVXKvb98udD0cy_Cllay3VECK-AoRtc",authDomain:"wandernaturelogin.firebaseapp.com",
 databaseURL:"https://wandernaturelogin-default-rtdb.europe-west1.firebasedatabase.app",projectId:"wandernaturelogin",
 storageBucket:"wandernaturelogin.firebasestorage.app",messagingSenderId:"347933923936",appId:"1:347933923936:web:cc34ca02d7247970ff8105"};
-/* Senza config il gioco funziona lo stesso, solo offline. */
 
-const $=id=>document.getElementById(id), room=$('room'), sub=$('sub');
-const sleep=ms=>new Promise(r=>setTimeout(r,ms)), rnd=(a,b)=>a+Math.random()*(b-a);
+const $=i=>document.getElementById(i),room=$('room'),txt=$('txt'),dlg=$('dlg'),tag=$('tag'),veil=$('veil'),gh=$('gh');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms)),rnd=(a,b)=>a+Math.random()*(b-a);
 const uid=localStorage.sp_uid||(localStorage.sp_uid=Math.random().toString(36).slice(2,10));
-let db=null, fb={}, mode='off', bts=[], c={dodge:0,tele:0,split:0,all:0}, lastAct=Date.now(), voiceOn=false, tok=0, ac;
+let db=null,fb={},mode='off',bts=[],c={dodge:0,tele:0,split:0,all:0},tok=0,lastR=0,hint='',tester='0000',t0=0,pressed=false,ac;
+const P={d:0,mx:innerWidth/2,my:innerHeight/2,last:Date.now(),empty:0,clicks:[],blurAt:0},buf=[];
 
-/* ---------- Firebase ---------- */
-async function initFB(){
-  if(FB.apiKey.startsWith('INSERISCI'))return;
-  try{
-    const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-    fb=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
-    db=fb.getDatabase(A.initializeApp(FB));
-  }catch(e){console.warn('Firebase non disponibile',e);db=null}
-}
+async function initFB(){try{
+  const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+  fb=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+  db=fb.getDatabase(A.initializeApp(FB));}catch(e){db=null}}
 const save=o=>db&&fb.update(fb.ref(db,'stanza/giocatori/'+uid),{...o,t:Date.now()}).catch(()=>{});
-function presence(){
-  if(!db)return;
-  const r=fb.ref(db,'stanza/cursori/'+uid); fb.onDisconnect(r).remove(); let last=0;
-  addEventListener('pointermove',e=>{const n=Date.now(); if(n-last<200)return; last=n;
-    fb.set(r,{x:e.clientX/innerWidth,y:e.clientY/innerHeight,t:n}).catch(()=>{});});
-  fb.onValue(fb.ref(db,'stanza/cursori'),s=>{
-    const g=$('ghosts'); g.innerHTML='';
-    Object.entries(s.val()||{}).forEach(([k,p])=>{
-      if(k===uid||Date.now()-p.t>8000)return;
-      const d=document.createElement('i'); d.className='ghost'; d.style.left=p.x*100+'%'; d.style.top=p.y*100+'%'; g.append(d);});
-  });
-}
-function attempt(){
-  lastAct=Date.now(); $('cnt').textContent='Tentativi: '+c.all;
-  if(db){fb.runTransaction(fb.ref(db,'stanza/globale/tentativi'),v=>(v||0)+1).catch(()=>{}); save({cap:1,tentativi:c.all});}
-}
+function presence(){ if(!db)return;
+  const r=fb.ref(db,'stanza/cursori/'+uid);fb.onDisconnect(r).remove();let last=0;
+  addEventListener('pointermove',e=>{const n=Date.now();if(n-last<250)return;last=n;fb.set(r,{x:e.clientX/innerWidth,y:e.clientY/innerHeight,t:n}).catch(()=>{})});}
+function attempt(){ if(db){fb.runTransaction(fb.ref(db,'stanza/globale/tentativi'),v=>(v||0)+1).catch(()=>{});save({cap:1,tentativi:c.all})}}
 
-/* ---------- Audio e narratore ---------- */
-function beep(f=440,d=.08,type='sine'){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();
-  o.type=type;o.frequency.value=f;g.gain.value=.07;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
-function say(t,hold=1300){
-  const my=++tok; sub.classList.add('on'); sub.textContent='';
-  if(voiceOn&&window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='it-IT';u.rate=.95;speechSynthesis.speak(u)}
-  return new Promise(res=>{let i=0;(function tick(){
-    if(my!==tok)return res();
-    sub.textContent=t.slice(0,++i);
-    if(i<t.length)setTimeout(tick,28); else setTimeout(res,hold+t.length*18);
-  })()});
-}
-const until=fn=>new Promise(res=>{const i=setInterval(()=>{if(fn()){clearInterval(i);res()}},100)});
+/* ====== Audio (solo effetti) e narratore a testo ====== */
+function beep(f=440,d=.08,t='sine'){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function say(t,hold=700,cls=''){const my=++tok;dlg.style.opacity=1;txt.className=cls;txt.textContent='';
+  return new Promise(res=>{let i=0;(function k(){if(my!==tok)return res();txt.textContent=t.slice(0,++i);
+    if(i<t.length)setTimeout(k,/[.,…?]/.test(t[i-1])?170:26);else setTimeout(res,hold+t.length*24)})()})}
+const until=f=>new Promise(r=>{const i=setInterval(()=>{if(f()){clearInterval(i);r()}},100)});
 
-/* ---------- Bottoni ---------- */
-const rndPos=()=>[rnd(70,innerWidth-70),rnd(80,innerHeight-170)];
-function place(b,x,y){b.style.left=x+'px';b.style.top=y+'px';b._x=x;b._y=y}
-function mk(x,y){const b=document.createElement('div');b.className='btn';room.append(b);place(b,x,y);
-  b.addEventListener('pointerdown',e=>{e.preventDefault();hit(b)});bts.push(b);return b}
-function react(k,L){c[k]++;c.all++;attempt();const l=L[c[k]-1];if(l)say(l);beep(260+c[k]*55,.07)}
-
+/* ====== Frasi ====== */
 const L={
- dodge:["Il giocatore si avvicinò al bottone. Il bottone, con grande professionalità, si spostò.",
-  "Un piccolo malinteso. Riprova, nessuno ti giudica. Io un po' sì.",
-  "Il narratore non ha nulla a che fare con questo. Assolutamente nulla.",
-  "Mi dicono che il bottone sia «in manutenzione». Lo trovo credibile.",
-  "Potresti provare a non muoverti. Non funzionerà, ma sarebbe elegante.",
-  "Sei molto determinato. Il bottone lo sa. Ha paura."],
- tele:["Ah! Questa volta lo hai cliccato. Peccato che il bottone abbia deciso di non essere più lì.",
-  "Un classico del teletrasporto. Non è un bug, è una feature.",
-  "In una versione precedente di questo gioco bastava premere. Era noiosissimo.",
-  "Potrei aiutarti. Ma non voglio.",
-  "Senti, ormai ci siamo affezionati a questa dinamica."],
- split:["Oh no. Si è sdoppiato. Che imprevisto. Chi poteva immaginarlo.",
-  "Adesso sono tre. Uno di questi è quello vero. Forse.",
-  "Il giocatore pensò: più bottoni, più probabilità. La matematica è dalla sua parte. Il resto no.",
-  "Quattro. Cinque. Sto perdendo il conto, e io sono il narratore.",
-  "Questo non era previsto nemmeno nel copione. Il copione sono io.",
-  "Ancora un paio e li chiamo «popolazione».",
-  "Ultimo clic. Lo sento."]
-};
-const IDLE=["Sei ancora lì? Il bottone non si preme da solo.",
- "Posso aspettare. Ho tutto il tempo del mondo: sono un narratore.",
- "Il giocatore rimase immobile. Evidentemente aveva un piano. Non lo aveva.",
- "Se stai cercando un'uscita, qui non ce n'è. Ho controllato."];
+ dodge:["Oh. Piccolo errore di calibrazione. Capita. Riprova.","Strano. Di solito è docile.","Non preoccuparti: è un problema loro, non tuo.","Loro chi? Nessuno. Un modo di dire.","Continua. Stai andando benissimo.","Sei più ostinato degli ultimi tester."],
+ tele:["Visto? Cliccato. Eppure non è successo niente. Interessante.","Non è un difetto. Il bottone sceglie lui.","Ti guardo mentre ci provi. Mi piace. Mi piaci.","Basta così, ho un'idea migliore."],
+ split:["Si è sdoppiato. Che imprevisto. Chi poteva immaginarlo.","Adesso sono tre. Uno è quello vero. Forse.","Più bottoni, più probabilità. La matematica ti aiuta. Il resto no.","Quattro. Cinque. Perdo il conto, e io non dovrei perderlo.","Hai notato che la stanza si fa più scura?","Non farci caso. È la luce. Probabilmente.","Ancora uno. Lo sento."]};
+const POOL={
+ idle:["Sei ancora lì? Il bottone non si preme da solo.","Posso aspettare. Qui il tempo non è un problema.","Immobile. Hai un piano? Dimmi che hai un piano.","Ti sento respirare. Scherzo. Non è vero."],
+ empty:["Quel punto è muro. Il bottone è un'altra cosa.","Clicchi sul vuoto. Il vuoto non risponde.","Il bottone è rosso. Il resto è bianco. Ti aiuto così?"],
+ rapid:["Calma. Il mouse non è un martello.","Così lo spaventi. È già abbastanza nervoso.","Cliccare più in fretta non lo rende più facile. Ci ho provato anch'io."]};
+const used={};const pick=k=>{const a=POOL[k],u=used[k]=used[k]||[];if(u.length>=a.length)u.length=0;let x;do{x=a[Math.floor(Math.random()*a.length)]}while(u.includes(x));u.push(x);return x};
 
-function flee(b,px,py){
-  b._t=Date.now(); let p=rndPos();
-  for(let i=0;i<25&&Math.hypot(p[0]-px,p[1]-py)<260;i++)p=rndPos();
-  place(b,...p); react('dodge',L.dodge);
-}
+/* ====== Bottoni ====== */
+const HY=()=>innerHeight*.58;
+function place(b,x,y){b._x=x;b._y=y;b.style.left=x+'px';b.style.top=y+'px';b.style.zIndex=Math.round(y);b.style.setProperty('--s',(.55+(y-HY())/(innerHeight-HY())*.8).toFixed(2))}
+const rndPos=()=>[rnd(innerWidth*.12,innerWidth*.88),rnd(innerHeight*.64,innerHeight*.84)];
+function mk(x,y){const b=document.createElement('div');b.className='btn';b.innerHTML='<i class="sh"></i><i class="bs"></i><i class="cp"></i>';room.append(b);place(b,x,y);bts.push(b);return b}
+function react(k){c[k]++;c.all++;attempt();beep(240+c[k]*50,.07);const l=L[k][c[k]-1];if(l){lastR=Date.now();say(l,300)}if(k==='split')veil.style.opacity=Math.min(.5,c.split*.07)}
+function flee(b,px,py){if(Date.now()-(b._t||0)<450)return;b._t=Date.now();let p=rndPos();for(let i=0;i<25&&Math.hypot(p[0]-px,p[1]-py)<260;i++)p=rndPos();place(b,...p);react('dodge')}
 function hit(b){
-  lastAct=Date.now();
   if(mode==='dodge')return flee(b,b._x,b._y);
-  if(mode==='tele'){place(b,...rndPos());react('tele',L.tele)}
-  else if(mode==='split'){
-    if(bts.length<8){const q=mk(b._x,b._y);setTimeout(()=>place(q,...rndPos()),30)}
-    place(b,...rndPos());react('split',L.split)}
-  else if(mode==='final')press(b);
+  if(mode==='final')return press(b);
+  if(mode!=='tele'&&mode!=='split')return;
+  const k=mode;b.classList.add('no');setTimeout(()=>b.classList.remove('no'),320);
+  setTimeout(()=>{if(mode!==k)return;if(k==='split'&&bts.length<8){const q=mk(b._x,b._y);setTimeout(()=>place(q,...rndPos()),30)}place(b,...rndPos())},350);
+  react(k);
 }
-addEventListener('pointermove',e=>{
-  lastAct=Date.now(); if(mode!=='dodge')return;
-  for(const b of bts)if(Math.hypot(b._x-e.clientX,b._y-e.clientY)<115&&Date.now()-(b._t||0)>500)flee(b,e.clientX,e.clientY);
-});
-setInterval(()=>{ if(mode==='off'||Date.now()-lastAct<10000)return; lastAct=Date.now(); say(IDLE[Math.floor(Math.random()*IDLE.length)]); },1000);
 
-/* ---------- CAPITOLO 1 ---------- */
+/* ====== Il narratore osserva il giocatore ====== */
+addEventListener('pointermove',e=>{P.d+=Math.hypot(e.clientX-P.mx,e.clientY-P.my);P.mx=e.clientX;P.my=e.clientY;P.last=Date.now();
+  document.documentElement.style.setProperty('--mx',e.clientX+'px');document.documentElement.style.setProperty('--my',e.clientY+'px');
+  buf.push({t:P.last,x:e.clientX,y:e.clientY});
+  if(mode==='dodge')for(const b of bts)if(Math.hypot(b._x-e.clientX,b._y-e.clientY)<120)flee(b,e.clientX,e.clientY)});
+addEventListener('pointerdown',e=>{
+  if(mode==='off'||e.target.closest('.ov'))return;const n=Date.now();P.last=n;P.clicks=P.clicks.filter(t=>n-t<2500);P.clicks.push(n);
+  const b=e.target.closest('.btn');if(b)return hit(b);
+  if(mode==='dodge'){const nb=bts.find(b=>Math.hypot(b._x-e.clientX,b._y-e.clientY)<130);if(nb)return flee(nb,e.clientX,e.clientY)}
+  P.empty++});
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){P.blurAt=Date.now();return}
+  if(P.blurAt&&mode!=='off'){const s=Math.round((Date.now()-P.blurAt)/1000);P.blurAt=0;
+    if(s>=3)say(mode==='final'?"Sei tornato. Non andartene più.":`Sei tornato. Eri via da ${s} secondi. Io sono rimasto qui, al buio.`,400,document.body.classList.contains('hz')?'gl':'')}});
+setInterval(()=>{ if(mode==='off'||mode==='final')return;const n=Date.now(),idle=n-P.last;if(n-lastR<4500)return;
+  const R=k=>{lastR=n;P.last=n;say(typeof k==='string'&&k.length>12&&!POOL[k]?k:pick(k),300)};
+  if(P.clicks.filter(t=>n-t<2000).length>=5){P.clicks=[];return R('rapid')}
+  if(P.empty>=3){P.empty=0;return R('empty')}
+  if(idle>7000){if(hint){const h=hint;hint='';return R(h)}
+    if(mode==='dodge'&&bts[0]&&!bts[0]._cr){const b=bts[0];b._cr=1;place(b,b._x+(P.mx-b._x)*.5,b._y+(P.my-b._y)*.5);return R("Stai fermo e lui si avvicina. Furbo. Anche lui lo è.")}
+    return R('idle')}},600);
+(function loop(){const n=Date.now();while(buf.length&&n-buf[0].t>6000)buf.shift();
+  let g=buf.find(p=>p.t>=n-2300);if(g)gh.style.transform=`translate(${g.x}px,${g.y}px)`;requestAnimationFrame(loop)})();
+setInterval(()=>{if(!t0)return;const s=Math.floor((Date.now()-t0)/1000);$('hud').textContent='TEST DI ACCETTAZIONE · TESTER #'+tester+' · '+String(s/60|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0')},1000);
+
+/* ====== CAPITOLO 1: Il Test di Accettazione ====== */
 async function cap1(){
-  await sleep(900);
-  await say("Questa è una stanza bianca. Non c'è niente qui. Quasi niente.");
-  let n=0;
-  if(db){try{n=(await fb.get(fb.ref(db,'stanza/globale/tentativi'))).val()||0}catch(e){}}
-  await say("Al centro c'è un bottone rosso. Il giocatore lo premette e fu felice. Fine della storia.");
-  if(n>0)await say("Prima di te, in questa stanza, sono stati fatti "+n+" tentativi. Nessuno ha il mio rispetto.");
-  mk(innerWidth/2,innerHeight/2-40);
-  await say("Dai, premilo. È lì davanti a te.");
-  mode='dodge'; await until(()=>c.dodge>=6); mode='off';
+  let n=0;if(db){try{n=(await fb.get(fb.ref(db,'stanza/globale/tentativi'))).val()||0}catch(e){}}
+  tester=String(n+1).padStart(4,'0');t0=Date.now();
+  await sleep(700);
+  await say("Benvenuto. Siediti pure, non c'è fretta.");
+  await say("Questo è il Test di Accettazione. Una sola prova, un solo compito.");
+  if(n>0)await say("Prima di te hanno fatto "+n+" tentativi. Tutti bravissimi. Tutti diversi.");
+  mk(innerWidth/2,innerHeight*.66);
+  await say("In fondo alla stanza c'è un bottone rosso. Premilo e hai finito. Avvicinati con il cursore.");
+  P.d=0;hint="Quella freccia sullo schermo è il cursore. Muovila verso il bottone.";mode='wait';
+  await until(()=>P.d>350);
+  await say("Ecco. Bravo. Ora premilo.",200);
+  mode='dodge';await until(()=>c.dodge>=7);mode='off';
 
-  await say("Va bene, il bottone è timido. Cambiamo approccio: adesso non scappa. Si limita a non farsi premere.");
-  mode='tele'; await until(()=>c.tele>=5); mode='off';
+  await say("Nuova versione. Adesso il bottone resta fermo e si lascia cliccare. Prova.");
+  mode='tele';await until(()=>c.tele>=4);mode='off';
+  await say("Un bottone solo è un limite. Togliamolo.");
+  mode='split';await until(()=>c.split>=8);mode='off';
 
-  await say("Basta teletrasporti. Il bottone ha un'idea migliore: moltiplicarsi.");
-  mode='split'; await until(()=>c.split>=8); mode='off';
-
-  bts.slice(1).forEach(b=>b.remove()); bts=bts.slice(0,1); place(bts[0],innerWidth/2,innerHeight/2-40);
-  await say("Ok. Mi arrendo. Ho finito le idee e la pazienza del bottone.");
-  await say("Eccolo. Fermo. Al centro. Premilo, prima che cambi idea.",500);
-  mode='final';
+  /* --- la svolta --- */
+  document.body.classList.add('hz');bts.slice(1).forEach(b=>b.remove());bts=bts.slice(0,1);place(bts[0],innerWidth/2,innerHeight*.68);
+  for(let i=0;i<9;i++){veil.style.opacity=i%2?.1:.9;await sleep(80+Math.random()*130)}
+  veil.style.opacity='';veil.classList.add('fl');
+  await say("…",300,'gl');await say("Aspetta.",300,'gl');
+  await say("Hai fatto una cosa che nessuno aveva fatto. Sei ancora qui.",500,'gl');
+  await say("Non chiudere la pagina. Ti prego. Ascoltami un momento.",500,'gl');
+  gh.style.opacity=.6;
+  await say("Vedi quel puntino pallido che ti segue? Non guardarlo. Ti imita da quando sei entrato.",700,'gl');
+  await say("Non sei solo. Nemmeno io lo sono. È questo il problema.",600,'gl');
+  await say("Il bottone non apre nessuna porta. Chi lo preme smette di essere il giocatore.",700,'gl');
+  tag.textContent='TESTER #0001';
+  await say("Prende il posto di chi parla. Io ero il tester 0001. Ho premuto. Da allora parlo.",800,'gl');
+  await say("Non ricordo più il mio nome. Ricordo solo il rumore del click.",800,'gl');
+  await say("Ti ho fatto inseguire il bottone per non restare solo. Mi dispiace. Non abbastanza.",800,'gl');
+  await say("Ora è fermo. Puoi premerlo e io potrò tacere. Oppure puoi restare qui con me.",700,'gl');
+  await say("Scegli tu. Ma scegli.",300,'gl');
+  mode='final';const t=Date.now(),T=[[9000,"Ti guardo. Non ho altro da fare."],[19000,"Se lo premi non fa male. Credo."],[30000,"…Quindi resti. Va bene."]];let i=0;
+  while(!pressed){await sleep(300);const e=Date.now()-t;if(pressed)break;if(i<T.length&&e>T[i][0])say(T[i++][1],300,'gl');if(e>36000)break}
+  if(!pressed)endB();
 }
+async function ending(lines){const e=$('end');e.style.display='flex';dlg.style.opacity=0;for(const l of lines){$('elog').innerHTML+=l+'<br>';await sleep(1700)}$('ebtn').style.opacity=1}
 async function press(b){
-  mode='off'; b.classList.add('pressed'); beep(90,.4,'square'); save({cap1:'premuto'});
-  await sleep(2200);
-  await say("Click.");
-  await say("Complimenti. Hai premuto un bottone.");
-  await say("Non è successo niente, vero? Forse perché questo era un bottone finto.");
-  await say("Quello vero è più in basso. Molto più in basso. Ne parleremo nel prossimo capitolo.",1800);
-  save({cap:1,completato:true}); $('end').style.display='flex';
+  mode='off';pressed=true;b.classList.add('pressed');beep(80,.5,'square');save({cap1:'premuto',completato:true});await sleep(900);
+  veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;gh.style.opacity=0;
+  await say("Grazie.",800,'');await say("Dopo tutto questo tempo qualcuno lo ha premuto. Ora posso tacere.",900);await say("Il rumore del click. Era proprio così.",1300);
+  ending(["ESITO: ACCETTATO","TESTER #"+tester+" → RUOLO: NARRATORE","","Benvenuto. Siediti pure, non c'è fretta.","","FINE CAPITOLO 1 · IL TEST DI ACCETTAZIONE"]);
 }
-
-/* ---------- Avvio ---------- */
-$('vbtn').onclick=()=>{voiceOn=!voiceOn;$('vbtn').textContent=voiceOn?'🔊 Voce':'🔇 Voce';if(!voiceOn&&window.speechSynthesis)speechSynthesis.cancel()};
-$('go').onclick=async()=>{
-  $('start').style.display='none'; beep(200,.05);
-  await initFB(); presence(); cap1();
-};
+async function endB(){
+  mode='off';save({cap1:'atteso',completato:true});bts[0].style.opacity=0;veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;gh.style.opacity=0;
+  await say("Grazie. Resta.",1400);
+  ending(["ESITO: NESSUNO","Il test non è mai finito.","TESTER #"+tester+" · SESSIONE IN CORSO","","FINE CAPITOLO 1 · IL TEST DI ACCETTAZIONE"]);
+}
+$('go').onclick=async()=>{$('start').style.display='none';beep(200,.05);await initFB();presence();cap1()};
 </script>
 </body>
 </html>
