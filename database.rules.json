@@ -7,33 +7,84 @@
         "tentativi": {
           ".read": true,
           ".write": "auth != null",
-          ".validate": "newData.isNumber() && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))"
+          ".validate": "newData.isNumber() && (data.exists() ? (newData.val() >= data.val() && newData.val() <= data.val() + 1) : newData.val() === 1)"
         },
-        "$altro": { ".validate": false }
+        "$altro": {
+          ".validate": false
+        }
       },
       "giocatori": {
         "$uid": {
           ".read": "auth != null && auth.uid === $uid",
           ".write": "auth != null && auth.uid === $uid",
-          "cap": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10" },
-          "tentativi": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 100000" },
-          "cap1": { ".validate": "newData.isString() && (newData.val() === 'premuto' || newData.val() === 'atteso')" },
-          "completato": { ".validate": "newData.isBoolean()" },
-          "t": { ".validate": "newData.isNumber() && newData.val() <= now + 60000" },
-          "$altro": { ".validate": false }
+          ".validate": "newData.hasChildren(['t'])",
+          "cap": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
+          },
+          "tentativi": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 100000"
+          },
+          "cap1": {
+            ".validate": "newData.isString() && (newData.val() === 'premuto' || newData.val() === 'atteso')"
+          },
+          "completato": {
+            ".validate": "newData.isBoolean()"
+          },
+          "t": {
+            ".validate": "newData.isNumber() && newData.val() <= now + 60000"
+          },
+          "$altro": {
+            ".validate": false
+          }
         }
       },
       "cursori": {
+        ".read": "auth != null",
         "$uid": {
           ".write": "auth != null && auth.uid === $uid",
-          ".validate": "newData.hasChildren(['x', 'y', 't'])",
-          "x": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1" },
-          "y": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1" },
-          "t": { ".validate": "newData.isNumber() && newData.val() <= now + 60000" },
-          "$altro": { ".validate": false }
+          ".validate": "!newData.exists() || newData.hasChildren(['x', 'y', 't'])",
+          "x": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+          },
+          "y": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+          },
+          "t": {
+            ".validate": "newData.isNumber() && newData.val() <= now + 60000"
+          },
+          "$altro": {
+            ".validate": false
+          }
         }
       },
-      "$altro": { ".validate": false }
+      "fantasmi": {
+        ".read": "auth != null",
+        ".indexOn": [
+          "t"
+        ],
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.hasChildren(['p', 't', 'h', 'n'])",
+          "p": {
+            ".validate": "newData.isString() && newData.val().length <= 2600 && newData.val().matches(/^[0-9,;]*$/)"
+          },
+          "t": {
+            ".validate": "newData.isNumber() && newData.val() <= now + 60000"
+          },
+          "h": {
+            ".validate": "newData.isString() && newData.val().matches(/^[0-2][0-9]:[0-5][0-9]$/)"
+          },
+          "n": {
+            ".validate": "newData.isString() && newData.val().matches(/^[0-9]{4,6}$/)"
+          },
+          "$altro": {
+            ".validate": false
+          }
+        }
+      },
+      "$altro": {
+        ".validate": false
+      }
     }
   }
 }

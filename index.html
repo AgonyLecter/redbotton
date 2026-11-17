@@ -60,6 +60,10 @@ body.hz #tag:before{background:#e33}
 .still #cico i{background:none;box-shadow:none;border:2px solid #fff;animation:none}.still #cico b{opacity:.9;width:2px;height:24px;margin:-12px -1px;border:0;border-radius:0;background:#fff;transform:rotate(45deg)}
 #cbar{display:block;height:3px;margin-top:5px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden}#cbar:empty{display:none}#cbar u{display:block;height:100%;background:#fff;transition:width .15s}
 #breath{position:fixed;left:50%;top:44%;width:160px;height:160px;margin:-80px;border-radius:50%;border:2px solid rgba(255,255,255,.7);box-shadow:0 0 40px rgba(255,255,255,.25) inset;opacity:0;pointer-events:none;z-index:17;transition:opacity .6s,transform 1.6s ease-in-out;transform:scale(.45)}
+#me{position:fixed;left:0;top:0;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:radial-gradient(circle at 40% 32%,#ff7a7a,#e00 50%,#5a0000);box-shadow:0 0 26px #f22,0 7px 0 #1c1c20;z-index:19;pointer-events:none;display:none}
+#me.hit{animation:mh .35s}@keyframes mh{40%{transform:scale(.7);box-shadow:0 0 50px #fff,0 2px 0 #1c1c20}}
+#hunt{position:fixed;left:0;top:0;width:58px;height:58px;z-index:19;pointer-events:none;display:none;filter:drop-shadow(0 0 10px rgba(0,0,0,.8));transition:transform .08s}
+.gc{position:fixed;left:0;top:0;z-index:19;pointer-events:none;font:10px/1.2 ui-monospace,monospace;color:#cfe;opacity:0;transition:opacity 1.5s;white-space:nowrap}.gc span{display:block;margin:2px 0 0 18px;opacity:.75}
 #js{position:fixed;inset:0;z-index:60;pointer-events:none;display:none;align-items:center;justify-content:center;background:#f2f2f5;overflow:hidden}
 #js svg{width:min(120vw,120vh);height:min(120vw,120vh);animation:jz .32s cubic-bezier(.2,1.6,.4,1) forwards}
 @keyframes jz{from{transform:scale(.15) rotate(-6deg)}to{transform:scale(1.25) rotate(2deg)}}
@@ -71,7 +75,7 @@ body.hz #tag:before{background:#e33}
 <div id="room"></div>
 <div id="veil"></div>
 <canvas id="fx"></canvas><div id="cue"></div><div id="rec"></div><div id="hud"></div><div id="card"></div>
-<div id="coach"><div id="cico"><i></i><b></b></div><div><span id="ctxt"></span><span id="cbar"></span></div></div><div id="breath"></div>
+<div id="coach"><div id="cico"><i></i><b></b></div><div><span id="ctxt"></span><span id="cbar"></span></div></div><div id="breath"></div><div id="me"></div><svg id="hunt" viewBox="0 0 24 24"><path d="M3 2l17 8-7 2-3 7z" fill="#0b0b0e" stroke="#eee" stroke-width="1.3"/></svg>
 <div id="js"><svg viewBox="0 0 400 400" aria-hidden="true"><defs><radialGradient id="jh" cx="50%" cy="38%" r="60%"><stop offset="0" stop-color="#16161a"/><stop offset=".6" stop-color="#060607"/><stop offset="1" stop-color="#000"/></radialGradient><filter id="jb"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
 <path d="M40 400 C60 300 120 270 200 268 C280 270 340 300 360 400Z" fill="#020203"/>
 <ellipse cx="200" cy="165" rx="92" ry="130" fill="url(#jh)" stroke="#000" stroke-width="3" filter="url(#jb)"/>
@@ -98,13 +102,16 @@ const $=i=>document.getElementById(i),room=$('room'),txt=$('txt'),dlg=$('dlg'),t
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),rnd=(a,b)=>a+Math.random()*(b-a);
 const T=matchMedia('(pointer:coarse)').matches,v=(m,t)=>T?t:m;
 const uid=localStorage.sp_uid||(localStorage.sp_uid=Math.random().toString(36).slice(2,10));
-let muted=false,rebel=0,db=null,fb={},mode='off',bts=[],c={dodge:0,tele:0,split:0,all:0},tok=0,lastR=0,hint='',tester='0000',t0=0,pressed=false,who='Tester',ans={},tg=null,ghN=0,sw=0,batt=null,kick=0;try{navigator.getBattery&&navigator.getBattery().then(b=>batt=b)}catch(e){}
+let muted=false,rebel=0,db=null,fb={},mode='off',bts=[],c={dodge:0,tele:0,split:0,all:0},tok=0,lastR=0,hint='',tester='0000',t0=0,pressed=false,who='Tester',ans={},tg=null,ghN=0,sw=0,batt=null,kick=0;
+/* batteria: solo se il browser la espone davvero (iPhone/Safari e Firefox non la danno; i computer senza batteria rispondono sempre 100% in carica: li scartiamo) */
+try{navigator.getBattery&&navigator.getBattery().then(b=>{if(b&&Number.isFinite(b.level)&&!(b.level===1&&b.charging&&!b.chargingTime))batt=b}).catch(()=>{})}catch(e){}
 const pad=n=>String(n).padStart(2,'0'),clk=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())},UA=navigator.userAgent,
-DV=/iPhone/.test(UA)?'iPhone':/iPad/.test(UA)?'iPad':/Android/.test(UA)?'telefono Android':/Windows/.test(UA)?'computer Windows':/Mac/.test(UA)?'Mac':'dispositivo che non riconosco',
+DV=/iPhone/.test(UA)?'iPhone':/iPad/.test(UA)||(/Macintosh/.test(UA)&&navigator.maxTouchPoints>1)?'iPad':/Android/.test(UA)?'telefono Android':/Windows/.test(UA)?'computer Windows':/Mac/.test(UA)?'Mac':'dispositivo che non riconosco',
 vis=Math.max(0,parseInt(localStorage.sp_v)||0),vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};localStorage.sp_v=vis+1;
 /* ultima visita: salvata come millisecondi, aggiornata mentre giochi e quando esci; valori assurdi vengono scartati */
 const NOW0=Date.now(),L0=parseInt(localStorage.sp_last,10),last=Number.isFinite(L0)&&L0>1.5e12&&L0<=NOW0+6e4&&NOW0-L0<3.2e10?Math.min(L0,NOW0):0;
-const stamp=()=>{try{localStorage.sp_last=String(Date.now())}catch(e){}};stamp();setInterval(stamp,15000);addEventListener('pagehide',stamp);
+let wiped=0,trail=[],trT=0;const trStr=a=>a.map(p=>p[0]+','+p[1]).join(';');
+const stamp=()=>{if(wiped)return;try{localStorage.sp_last=String(Date.now());if(trail.length>40)localStorage.sp_trail=trStr(trail)}catch(e){}};stamp();setInterval(stamp,15000);addEventListener('pagehide',stamp);
 const ago=()=>{if(!last)return '';const s=Math.max(0,(NOW0-last)/1000),m=s/60;const u=(x,a,b)=>x+' '+(x===1?a:b);
   return s<60?'pochi secondi':m<60?u(Math.max(1,Math.round(m)),'minuto','minuti'):m<1440?u(Math.round(m/60),'ora','ore'):u(Math.round(m/1440),'giorno','giorni')};
 const esc=x=>String(x).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
@@ -180,7 +187,7 @@ const rdr=new THREE.WebGLRenderer({antialias:!T,powerPreference:'high-performanc
 rdr.setPixelRatio(Math.min(devicePixelRatio||1,T?1.6:2));rdr.outputColorSpace=THREE.SRGBColorSpace;room.append(rdr.domElement);
 const FOGC=new THREE.Color(0xe4e4ea),DARKC=new THREE.Color(0x040406);
 const scene=new THREE.Scene();scene.background=FOGC.clone();scene.fog=new THREE.FogExp2(FOGC.clone(),.03);
-const cam=new THREE.PerspectiveCamera(60,1,.1,70);let baseFov=60,camZ=CZ,camZT=CZ;
+const cam=new THREE.PerspectiveCamera(60,1,.1,70);let baseFov=60,camZ=CZ,camZT=CZ,eyeY=EY;
 const resize=()=>{rdr.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;baseFov=innerWidth<innerHeight?74:58;cam.fov=baseFov;cam.updateProjectionMatrix()};
 addEventListener('resize',resize);resize();
 
@@ -379,7 +386,7 @@ function frame3(n){try{
   /* camera: sguardo che segue il dito + respiro + tremito della paura */
   const nx=P.mx/innerWidth-.5,ny=P.my/innerHeight-.5;cyaw+=((-nx*.24)-cyaw)*.04;cpit+=((-ny*.09)-cpit)*.04;kick*=.9;
   const wk=camZ-camZT;camZ+=(camZT-camZ)*.05;
-  cam.position.set(Math.sin(n/2600)*.03+(hz?(Math.random()-.5)*.004*fear:0)+Math.sin(n/160)*.02*Math.min(1,wk),EY+Math.sin(n/1100)*.012-kick*.04-Math.abs(Math.sin(n/160))*.035*Math.min(1,wk),camZ);
+  cam.position.set(Math.sin(n/2600)*.03+(hz?(Math.random()-.5)*.004*fear:0)+Math.sin(n/160)*.02*Math.min(1,wk),eyeY+Math.sin(n/1100)*.012-kick*.04-Math.abs(Math.sin(n/160))*.035*Math.min(1,wk),camZ);
   cam.rotation.set(-.11+cpit+Math.sin(n/1900)*.012+kick*Math.sin(n/38)*.025,cyaw,hz?Math.sin(n/1300)*.012*fear*2.5+kick*.02:0,'YXZ');
   cam.fov=baseFov+Math.sin(n/1700)*.4*(1+fear*2.5)-kick*3;cam.updateProjectionMatrix();cam.updateMatrixWorld();
   /* luci, nebbia */
@@ -455,6 +462,7 @@ async function jumpscare(){lurkOn=0;mode='off';hint='';G={};coach();++tok;dlg.st
 const root=document.documentElement;
 function touchAt(x,y){P.last=Date.now();P.mx=x;P.my=y;buf.push({t:P.last,x,y})}
 addEventListener('pointermove',e=>{P.d+=Math.hypot(e.clientX-P.mx,e.clientY-P.my);touchAt(e.clientX,e.clientY);
+  if(t0&&P.last-trT>110){trT=P.last;trail.push([Math.round(e.clientX/innerWidth*999),Math.round(e.clientY/innerHeight*999)]);if(trail.length>320)trail.shift()}
   if(mode==='dodge')for(const b of bts)if(Math.hypot(b._x-e.clientX,b._y-e.clientY)<Math.max(120,b._r*1.7))flee(b,e.clientX,e.clientY)});
 addEventListener('pointerdown',e=>{touchAt(e.clientX,e.clientY);if(mode==='off'||e.target.closest('.ov,#dlg'))return;const n=Date.now();P.taps++;
   P.clicks=P.clicks.filter(t=>n-t<2500);P.clicks.push(n);const b=btAt(e.clientX,e.clientY);if(b)return hit(b);
@@ -517,7 +525,7 @@ async function cap1(){
   await say(rb?"Ce l'hai fatta, dopo "+rb+(rb===1?" errore":" errori")+". Prendo nota.":"Perfetto. Obbedienza assoluta. Prendo nota.");
   if(n>0)await say("Prima di te, qui dentro, ci sono stati "+n+" tentativi.");
   await say(`Vedo che usi un ${DV}, con uno schermo di ${innerWidth}×${innerHeight}.`+(T?" Il tuo dito è l'unico cursore che ho.":" Il tuo mouse è l'unico cursore che ho."),400);
-  if(batt&&T){const bl=Math.round(batt.level*100);await say("Batteria al "+bl+"%. "+(bl<30?"Poca. Se si spegne a metà, resti qui dentro a metà.":"Abbastanza per arrivare alla fine. La tua, non la sua."),500)}
+  if(batt){const bl=Math.round(batt.level*100);await say("La tua batteria è al "+bl+"%"+(batt.charging?", ed è attaccata alla corrente. Ti stai preparando a restare a lungo.":". "+(bl<25?"Poca. Se si spegne a metà, resti qui dentro a metà.":"Abbastanza per arrivare alla fine. La tua, non la mia.")),500)}
   /* il bottone è LONTANO, in fondo alla stanza: il giocatore cammina toccando lo schermo */
   const b0=mk(innerWidth/2,innerHeight*.66);b0.wx=b0.g.position.x=0;b0.wz=-5;b0.g.position.z=-5;
   await say("Laggiù, in fondo alla stanza, c'è un bottone rosso. Premilo e il test è concluso.");
@@ -616,7 +624,7 @@ async function cap1(){
     if(Math.random()<.35){showFig(50+Math.sin(e/2100)*22,.8+e/40000*2.1);if(Math.random()<.5)S.step()}if(e>40000)break}
   if(!pressed)endB();
 }
-async function ending(lines,light,k){const E=JSON.parse(localStorage.sp_e||'[]');if(!E.includes(k)){E.push(k);localStorage.sp_e=JSON.stringify(E)}lines=[...lines.slice(0,-1),'FINALE «'+k+'» · TROVATI '+E.length+' SU 4',...lines.slice(-1)];const e=$('end');if(light){e.style.background='#fff';e.style.color='#333'}e.style.display='flex';e.style.opacity=0;e.style.transition='opacity 4s';
+async function ending(lines,light,k){const E=JSON.parse(localStorage.sp_e||'[]');if(!E.includes(k)){E.push(k);localStorage.sp_e=JSON.stringify(E)}lines=[...lines.slice(0,-1),'FINALE «'+k+'» · TROVATI '+E.length+' SU 6',...lines.slice(-1)];const e=$('end');if(light){e.style.background='#fff';e.style.color='#333'}e.style.display='flex';e.style.opacity=0;e.style.transition='opacity 4s';
   requestAnimationFrame(()=>e.style.opacity=1);await sleep(4300);dlg.style.opacity=0;for(const l of lines){$('elog').innerHTML+=esc(l)+'<br>';await sleep(1800)}$('ebtn').style.opacity=1}
 async function press(b){
   mode='off';sw=0;pressed=true;beat(false);b.classList.add('pressed');S.click();setTimeout(S.thud,150);room.classList.add('shake');save({cap1:'premuto',completato:true});await sleep(1000);
@@ -656,7 +664,7 @@ async function cap2(){
   await redo("Benvenuto in un posto sicuro.","No. Non è sicuro. Mi correggo.");
   await say("Ti mostro dove le tengono. Si chiama Archivio. Apriamo il tuo fascicolo.",500);
   setTag('ARCHIVIO · FASCICOLO');
-  const f=['NOME: '+who,'TESTER: #'+tester,'DISPOSITIVO: '+DV,'ORA LOCALE: '+clk(),'TOCCHI: '+P.taps,'DISTANZA PERCORSA: '+Math.round(P.d)+' px','USCITE DALLA PAGINA: '+leaves,'CONNESSIONE: '+(navigator.connection?navigator.connection.effectiveType:'ignota'),'FUSO: '+Intl.DateTimeFormat().resolvedOptions().timeZone,'ENTRATE: '+(vis+1),'LINGUA: '+navigator.language,'CONFESSIONE: '+(localStorage.sp_conf||'—'),'SCHERMO: '+innerWidth+'×'+innerHeight];
+  const f=['NOME: '+who,'TESTER: #'+tester,'DISPOSITIVO: '+DV,'ORA LOCALE: '+clk(),'TOCCHI: '+P.taps,'DISTANZA PERCORSA: '+Math.round(P.d)+' px','USCITE DALLA PAGINA: '+leaves,...(navigator.connection&&/^(wifi|cellular|ethernet)$/.test(navigator.connection.type)?['CONNESSIONE: '+{wifi:'Wi-Fi',cellular:'rete mobile',ethernet:'cavo'}[navigator.connection.type]]:[]),...(batt?['BATTERIA: '+Math.round(batt.level*100)+'%'+(batt.charging?' (in carica)':'')]:[]),'FUSO: '+Intl.DateTimeFormat().resolvedOptions().timeZone,'ENTRATE: '+(vis+1),'LINGUA: '+navigator.language,'CONFESSIONE: '+(localStorage.sp_conf||'—'),'SCHERMO: '+innerWidth+'×'+innerHeight];
   for(const l of f){S.glitch();await say(l,150)}
   setTag('TU · NARRATORE');
   await say("Compilato prima che arrivassi. Non mi serve il microfono: ho i tuoi tocchi, i tuoi silenzi, le volte che sei uscito dalla pagina.",700);
@@ -701,7 +709,7 @@ async function cap2(){
   const z=await choose(["Entra","Resta"]);lurkOn=0;
   await say(z?"Resti. Allora non sarai solo.":"Entri. Allora prima devi passare da lui.",200,'gl');await jumpscare();
   hum(30,0,2);veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;
-  const T3=["","FINE CAPITOLO 2 · L'ARCHIVIO DEI CURSORI","CAPITOLO 3 · COMING SOON"];
+  const T3=["","FINE CAPITOLO 2 · L'ARCHIVIO DEI CURSORI","CAPITOLO 3 · SBLOCCATO"];
   if(z===0){sp("Benvenuto, "+who);await say("Dall'altra parte c'è già qualcuno. Ha il tuo nome. Sta per parlare.",900);
     ending(["Hai varcato la porta.","Nella stanza bianca c'è un bottone rosso e un tester nuovo.","Apre bocca. Parla con la tua voce. Tu non hai deciso nulla.",...T3],true,'La Voce')}
   else{showGh(0);await say("Resta. Il fascicolo si aggiorna da solo.",900);
@@ -727,6 +735,119 @@ addEventListener('dragstart',e=>e.preventDefault());
 addEventListener('keydown',e=>{const k=(e.key||'').toLowerCase();if(k==='f12'||((e.ctrlKey||e.metaKey)&&(k==='u'||k==='s'||(e.shiftKey&&'ijc'.includes(k))))){e.preventDefault();t0&&say("No. Da qui non si esce, {n}.",300,'gl')}});
 {let dtw=0;setInterval(()=>{if(T||!t0||window.self!==window.top)return;const o=outerWidth-innerWidth>170||outerHeight-innerHeight>220;
   if(o&&!dtw){dtw=1;say("Stai guardando dentro di me, {n}. Chiudi quella finestra. Il codice non ti dirà come uscire.",400,'gl')}if(!o)dtw=0},2000)}
+/* ===== CAPITOLO 3 · Senza Volto =====
+   Lore: il bottone è sempre stato un tester. Chi perde il nome perde il volto.
+   L'ospite senza volto è il Tester #0000: per la prima volta parla.
+   Meccaniche nuove: 1) SEI il bottone e scappi da un cursore che si muove con i TUOI gesti registrati nei capitoli prima;
+   2) proteggi con la torcia le lettere del tuo nome; 3) vedi i movimenti VERI di altri giocatori e scegli se lasciare il tuo
+   o cancellare davvero la memoria del gioco. */
+const parseTr=x=>String(x||'').split(';').map(q=>q.split(',').map(Number)).filter(q=>q.length===2&&q.every(Number.isFinite)).map(q=>[Math.max(0,Math.min(999,q[0])),Math.max(0,Math.min(999,q[1]))]);
+const letTex=ch=>{const cv=document.createElement('canvas');cv.width=cv.height=256;const g=cv.getContext('2d');g.textAlign='center';g.textBaseline='middle';g.font='italic bold 210px Georgia,serif';
+  g.shadowColor='#f00';g.shadowBlur=30;g.fillStyle='#ff2a2a';g.fillText(ch,128,140);g.shadowBlur=0;g.fillStyle='#ff6a6a';g.fillText(ch,128,140);const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;return t};
+const nap=()=>new Promise(r=>requestAnimationFrame(r));
+async function beButton(mine,dur){const me=$('me'),hu=$('hunt'),W=()=>innerWidth,H=()=>innerHeight;
+  let mx=W()/2,my=H()*.7,hx=W()*.15,hy=H()*.2,i=0,caught=0,inv=0,t1=Date.now(),lt=t1,said=0;P.mx=mx;P.my=my;
+  me.style.display=hu.style.display='block';coach('drag',(T?'TRASCINA IL DITO':'MUOVI IL MOUSE')+': SEI IL BOTTONE · SCAPPA DAL CURSORE',0);
+  guide([v("Muovi il mouse: il bottone rosso segue la tua mano. Tienilo lontano dal cursore.","Tieni il dito sullo schermo e trascinalo: il bottone rosso ti segue. Tienilo lontano dal cursore nero."),"Non fermarti. Lui non si stanca.","Scappa. Lo facevi anche tu, nel capitolo uno. Solo che eri dall'altra parte."],()=>Date.now()-t1<dur,()=>[mx,my]);
+  while(Date.now()-t1<dur){await nap();const n=Date.now(),dt=Math.min(3,(n-lt)/16.7),el=(n-t1)/dur;lt=n;
+    /* il bottone (tu) segue il dito, ma non può teletrasportarsi */
+    const dx=P.mx-mx,dy=P.my-my,dl=Math.hypot(dx,dy),mv=Math.min(dl,11*dt);if(dl>0){mx+=dx/dl*mv;my+=dy/dl*mv}
+    mx=Math.max(32,Math.min(W()-32,mx));my=Math.max(70,Math.min(H()-32,my));
+    /* il cacciatore: punta verso di te + ripete i TUOI movimenti registrati */
+    const sp=(1.5+el*3.2)*dt,ax=mx-hx,ay=my-hy,al=Math.hypot(ax,ay)||1;hx+=ax/al*sp;hy+=ay/al*sp;
+    if(mine.length>10){const a=mine[i%mine.length],b=mine[(i+1)%mine.length];i++;let rx=(b[0]-a[0])/999*W(),ry=(b[1]-a[1])/999*H();const rl=Math.hypot(rx,ry);if(rl>30){rx*=30/rl;ry*=30/rl}hx+=rx*.55*dt;hy+=ry*.55*dt}
+    hx=Math.max(0,Math.min(W()-20,hx));hy=Math.max(0,Math.min(H()-20,hy));
+    me.style.transform=`translate(${mx}px,${my}px)`;hu.style.transform=`translate(${hx-6}px,${hy-6}px)`;coachP(el);
+    if(n>inv&&Math.hypot(hx-mx,hy-my)<36){caught++;inv=n+1300;S.click();vib(90);me.classList.remove('hit');void me.offsetWidth;me.classList.add('hit');hu.style.transform+=' scale(.75)';
+      const k=Math.random()<.5?0:W();hx=k?W()-40:40;hy=H()*.15}
+    if(!said&&el>.3&&mine.length>10){said=1;say("Guarda come si muove. Quelle curve, quelle esitazioni. Non le ho inventate: sono le tue. Ho registrato il tuo dito nei capitoli prima. Stai scappando da te stesso.",200,'gl')}}
+  G={};coach();me.style.display=hu.style.display='none';return caught}
+async function protectName(name){const L=[...name].slice(0,10),N=L.length,lost=new Array(N).fill(0);
+  const els=L.map((ch,i)=>{const u=N>1?i/(N-1):.5;let p,nrm;
+    /* le lettere stanno sulla parete di fondo, sfalsate come se qualcuno le avesse scritte di fretta */
+    p=new THREE.Vector3(-3.1+u*6.2,1.45+(i%2)*.85+rnd(-.1,.1),ZF);nrm=new THREE.Vector3(0,0,1);
+    const sz=Math.min(1.5,6.4/N+.3),pp=p.clone().addScaledVector(nrm,.03);
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(sz,sz),new THREE.MeshBasicMaterial({map:letTex(ch.toUpperCase()),transparent:true,opacity:0,depthWrite:false,fog:false}));
+    m.position.copy(pp);m.lookAt(pp.clone().add(nrm));scene.add(m);return{m,p,nrm}});
+  for(let k=0;k<20;k++){els.forEach(o=>o&&(o.m.material.opacity=k/20));await sleep(50)}
+  const mask=()=>L.map((c,i)=>lost[i]?'·':c).join('');
+  const msg=()=>(T?'TRASCINA IL DITO':'MUOVI IL MOUSE')+': ILLUMINA L\'OSPITE · '+mask().toUpperCase();
+  coach('drag',msg());let saved=0;const order=[...L.keys()].filter(i=>els[i]).sort(()=>Math.random()-.5),A=Math.min(order.length,6);
+  for(let a=0;a<A;a++){const i=order[a],o=els[i];await sleep(rnd(1400,2600));
+    /* l'ospite compare sotto la lettera, sul pavimento */
+    const fx2=Math.max(-3.3,Math.min(3.3,o.p.x+o.nrm.x*.7)),fz=Math.max(ZF+.6,Math.min(camZ-2.2,o.p.z+o.nrm.z*.7));
+    figG.position.set(fx2,0,fz);figG.scale.setScalar(1.3);figNear=false;figG.visible=true;noise(.7,.06,500);S.step();
+    const t1=Date.now();let ok=0;
+    while(Date.now()-t1<3300){await sleep(80);const q=proj(figG.position.x,1.9,figG.position.z);if(Math.hypot(TX-q[0],TY-q[1])<170){ok=1;break}if(Date.now()-t1>1700)figG.position.x+=(Math.random()-.5)*.03}
+    figG.visible=false;
+    if(ok){saved++;S.glitch();if(a===0)say("Mi hai visto. Mi ritiro. Per adesso.",100,'gl')}
+    else{lost[i]=1;S.thud();vib([120,50,120]);for(let k=10;k>=0;k--){o.m.material.opacity=k/10;o.m.position.y+=.02;await sleep(40)}scene.remove(o.m);
+      say(["Una lettera. Ha un buon sapore.","Un'altra. Il tuo nome si accorcia.","Senti che manca qualcosa? È lì che stava la tua faccia.","Ancora una. Presto mi assomiglierai."][Math.min(a,3)],100,'gl')}
+    coach('drag',msg())}
+  coach();await sleep(600);els.forEach(o=>o&&scene.remove(o.m));return{mask:mask(),lost:lost.filter(Boolean).length,N}}
+async function ghosts(){if(!db)return null;try{const sn=await Promise.race([fb.get(fb.query(fb.ref(db,'stanza/fantasmi'),fb.orderByChild('t'),fb.limitToLast(9))),sleep(5000).then(()=>null)]);
+  if(!sn||!sn.exists())return[];const out=[];sn.forEach(c=>{if(c.key===auid)return;const v2=c.val()||{},pt=parseTr(v2.p);if(pt.length>20)out.push({pt,t:+v2.t||0,h:String(v2.h||'').slice(0,5),n:String(v2.n||'').slice(0,6)})});return out.slice(-8)}catch(e){return null}}
+function showGhosts(list){const els=list.map(g=>{const d=document.createElement('div');d.className='gc';
+    const a=Date.now()-g.t,ag=a<36e5?Math.max(1,Math.round(a/6e4))+' min fa':a<864e5?Math.round(a/36e5)+' ore fa':Math.round(a/864e5)+' giorni fa';
+    d.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24"><path d="M3 2l17 8-7 2-3 7z" fill="#e8fff4" stroke="#111" stroke-width="1.5"/></svg><span></span>';
+    d.lastChild.textContent='#'+(g.n||'????')+' · '+(g.h||'--:--')+' · '+ag;document.body.append(d);return{d,g,i:Math.floor(Math.random()*g.pt.length)}});
+  requestAnimationFrame(()=>els.forEach(e=>e.d.style.opacity=.85));
+  const iv=setInterval(()=>els.forEach(e=>{const q=e.g.pt[e.i++%e.g.pt.length];e.d.style.transform=`translate(${q[0]/999*innerWidth}px,${q[1]/999*innerHeight}px)`;e.d.style.transition='opacity 1.5s,transform .12s linear'}),120);
+  return()=>{clearInterval(iv);els.forEach(e=>{e.d.style.opacity=0;setTimeout(()=>e.d.remove(),1600)})}}
+async function cap3(){
+  const real=localStorage.sp_name||'Tester';who=real;tester=localStorage.sp_t||'0000';t0=Date.now();camZ=camZT=CZ;eyeY=EY;
+  const mine=parseTr(localStorage.sp_trail);hum(40,.03,4);
+  await card('CAPITOLO 3<br><small style="letter-spacing:.18em;opacity:.55;font-size:.8em">SENZA VOLTO</small>');
+  setTag('');await sleep(2500);
+  await say("…",1500);
+  await say("Silenzio. Te ne sei accorto? Nessuno ti ha dato il benvenuto.",600);
+  setTag('SENZA VOLTO');S.step();
+  await say("Il narratore non c'è. Parlo io. Quello che stava in fondo alla stanza. Quello senza volto.",700,'gl');
+  await say("Non ho una bocca. Prendo in prestito le parole che sono rimaste nell'Archivio.",700,'gl');
+  await say("Il test non l'hanno costruito per te, {n}. L'hanno costruito per me. Io sono il tester numero zero. Quello prima del primo.",800,'gl');
+  await say("Ho premuto, tanto tempo fa. Poi ho dimenticato il mio nome. Poi la mia faccia. Qui funziona così: senza un nome, non hai un volto.",900,'gl');
+  await say("Ma prima ti mostro una cosa. Cosa si prova a essere il bottone.",400,'gl');
+  /* --- 1. SEI IL BOTTONE --- */
+  eyeY=.32;hum(48,.04,2);await sleep(1200);
+  await say("Abbassati. Adesso guardi la stanza dal pavimento. Il bottone rosso sei tu.",200,'gl');
+  await say(v("Il bottone segue il tuo mouse.","Tieni il dito sullo schermo e trascinalo: il bottone segue il tuo dito.")+" Quel cursore nero vuole premerti. Non farti prendere.",100,'gl');
+  mode='off';const caught=await beButton(mine,32000);eyeY=EY;
+  await say(caught?"Ti ha premuto "+caught+(caught>1?" volte":" volta")+". "+(caught>1?"Ogni volta un click.":"Un click.")+" Adesso sai perché il bottone scappava.":"Non ti ha preso nemmeno una volta. Neanche tu riuscivi a prendere il bottone, all'inizio. Siete uguali.",700,'gl');
+  if(mine.length<=10)await say("Quel cursore era solo un'ombra. Il tuo vero dito non l'ho ancora registrato abbastanza. Ma ci sto lavorando.",600,'gl');
+  /* --- 2. IL NOME --- */
+  document.body.classList.add('hz');veil.classList.add('fl');veil.style.opacity='';setDoor(1);hum(36,.07,3);camZ=camZT=1.2;
+  for(let i=0;i<5;i++){veil.style.opacity=i%2?.1:.9;S.glitch();await sleep(90+Math.random()*110)}veil.style.opacity='';
+  await say("Ora voglio una cosa tua. Il tuo nome. Eccolo, sui muri: {n}. Lettera per lettera.",400,'gl');
+  await say(v("Muovi il mouse","Trascina il dito sullo schermo")+" per muovere la torcia. Quando compaio sotto una lettera, illuminami e mi ritiro. Se non mi vedi in tempo, la lettera è mia.",200,'gl');
+  const r=await protectName(real);
+  who=r.lost>=r.N?'nessuno':r.mask;
+  if(!r.lost)await say("Tutte salve. Il tuo nome è intero. Allora resto senza, ancora. Ci sono abituato.",700,'gl');
+  else if(r.lost<r.N)await say("Ora ti chiamo così: {n}. Ti piace? È quello che resta di te.",700,'gl');
+  else await say("Non hai più un nome. Guarda lo schermo, adesso, nel riflesso. C'è ancora una faccia? Controlla.",900,'gl');
+  /* --- 3. FANTASMI VERI --- */
+  await say("Ultima cosa. Te la mostro perché nessun gioco l'ha mai fatto.",500,'gl');
+  const gl2=await ghosts();let stop=null;
+  if(gl2&&gl2.length){stop=showGhosts(gl2);
+    await say("Questi cursori non li ho inventati io. Sono dita vere. "+gl2.length+(gl2.length>1?" persone vere che hanno giocato":" persona vera che ha giocato")+" prima di te, e "+(gl2.length>1?"hanno":"ha")+" deciso di lasciare qui il proprio movimento.",900,'gl');
+    await say("Accanto a ognuno c'è l'ora che aveva sul suo schermo, e quanto tempo fa è successo. Nessun nome. Nessun volto. Come me.",900,'gl');
+    await say("Guardali esitare. Ognuno esita in modo diverso. È l'unica cosa che resta di loro.",900,'gl')}
+  else if(gl2)await say("Di solito qui ti mostrerei i movimenti veri di chi è passato prima di te. Ma non c'è nessuno. Sei il primo ad arrivare fin qui.",900,'gl');
+  else await say("Volevo mostrarti i movimenti veri degli altri giocatori, ma non riesco a raggiungerli. Sei offline, oppure fuori non c'è più niente.",900,'gl');
+  await say("Adesso scegli. Puoi lasciare qui il tuo movimento: chi giocherà dopo di te vedrà il tuo dito muoversi, con l'ora e il numero di tester. Mai il tuo nome.",300,'gl');
+  await say("Oppure puoi dimenticare. «Dimentica» cancella davvero i tuoi salvataggi su questo dispositivo: nome, capitoli, finali. Il gioco non saprà più chi sei. Non è una metafora.",200,'gl');
+  const z=await choose(["Lascia il mio segno","Dimentica tutto"]);if(stop)stop();
+  if(z===0){let ok=false;const tr=trail.length>40?trail:mine;
+    if(db&&auid&&tr.length>20){try{await Promise.race([fb.set(fb.ref(db,'stanza/fantasmi/'+auid),{p:trStr(tr.slice(-250)),t:fb.serverTimestamp(),h:clk(),n:String(tester).replace(/\D/g,'').slice(0,6).padStart(4,'0')}),sleep(6000).then(()=>{throw 0})]);ok=true}catch(e){}}
+    await say(ok?"Fatto. Il tuo dito è uscito da qui. Adesso si muove nel capitolo 3 di qualcun altro.":"Non sono riuscito a portarti fuori. Il tuo segno resta solo qui, in questo dispositivo.",900,'gl');
+    await say("Grazie, {n}. Adesso ho anche il modo in cui esiti. Mi manca solo una faccia.",900,'gl');
+    await jumpscare();
+    ending(ok?["IL TUO MOVIMENTO È STATO SALVATO","Qualcuno, da qualche parte, lo vedrà muoversi alle "+clk()+".","Non saprà chi eri. Vedrà solo come esitavi.","","FINE CAPITOLO 3 · SENZA VOLTO"]:["IL TUO MOVIMENTO È RIMASTO QUI","Nessuno lo vedrà. Solo tu, e io.","","FINE CAPITOLO 3 · SENZA VOLTO"],false,'Il Segno')}
+  else{await say("Va bene. Ti tolgo il nome. Ti tolgo la faccia. Poi ti lascio andare.",900,'gl');
+    if(db&&auid){try{fb.remove(fb.ref(db,'stanza/giocatori/'+auid));fb.remove(fb.ref(db,'stanza/fantasmi/'+auid))}catch(e){}}
+    await jumpscare();
+    await ending(["MEMORIA CANCELLATA","Nome, capitoli e finali sono stati cancellati da questo dispositivo.","La prossima volta che entri, nessuno ti riconoscerà.","Nemmeno tu sarai sicuro di essere già stato qui.","","FINE CAPITOLO 3 · SENZA VOLTO"],false,"L'Oblio");
+    wiped=1;try{Object.keys(localStorage).filter(k=>k.startsWith('sp_')).forEach(k=>localStorage.removeItem(k))}catch(e){}}
+}
 /* ===== Extra: bivio, ripensamento, crash, memoria ===== */
 async function redo(a,b){++tok;dlg.style.opacity=1;txt.className='';for(let i=1;i<=a.length;i++){txt.textContent=a.slice(0,i);await sleep(26)}await sleep(600);for(let i=a.length;i>=0;i--){txt.textContent=a.slice(0,i);await sleep(12)}await sleep(350);return say(b,400)}
 async function crash(){const e=$('card');e.style.cssText+=';font:.8rem/1.8 ui-monospace,monospace;letter-spacing:.08em;text-align:left;color:#f33';e.innerHTML='ERRORE 0x0001<br>IL NARRATORE HA SMESSO DI RISPONDERE<br>nessun segnale dalla stanza';e.style.opacity=1;vib([60,60,60]);S.glitch();await sleep(2600);e.innerHTML+='<br>riconnessione...';await sleep(1900);e.style.opacity=0;await sleep(1400);e.style.font='';e.style.letterSpacing='';e.style.textAlign='';e.style.color=''}
@@ -749,7 +870,8 @@ addEventListener('offline',()=>t0&&say("Hai tolto la connessione. Credi che serv
 matchMedia('(orientation:portrait)').addEventListener('change',()=>t0&&say("Hai girato lo schermo. Cerchi un'altra angolazione? Non ce n'è.",300,'gl'));
 const begin=async f=>{history.pushState(null,'');addEventListener('popstate',()=>{history.pushState(null,'');t0&&say("Indietro non esiste, {n}.",300,'gl')});clearInterval(mqt);$('start').style.display='none';bts.forEach(b=>b.remove());bts=[];AC();S.ok();await initFB();presence();(typeof f==='function'?f:cap1)()};
 function menu(){mn.innerHTML='<a id="go">Inizia il test</a><a id="chs">Capitoli</a><a id="snd">Audio: '+(muted?'spento':'attivo')+'</a>';$('go').onclick=()=>begin();$('chs').onclick=chap;$('snd').onclick=()=>{muted=!muted;if(mg)mg.gain.value=muted?0:1;menu()}}
-function chap(){mn.innerHTML='<a id="c1">Capitolo 1 · Il Test di Accettazione</a>'+(JSON.parse(localStorage.sp_e||'[]').length?'<a id="c2">Capitolo 2 · L\'Archivio dei Cursori</a>':'<a class="lk">Capitolo 2 · finisci il capitolo 1</a>')+'<a class="lk">Capitolo 3 · coming soon</a><a id="bk">← Indietro</a>';$('c1').onclick=()=>begin();if($('c2'))$('c2').onclick=()=>begin(cap2);$('bk').onclick=menu}
+const E3=()=>{const E=JSON.parse(localStorage.sp_e||'[]');return E.includes('La Voce')||E.includes("L'Archivio")};
+function chap(){mn.innerHTML='<a id="c1">Capitolo 1 · Il Test di Accettazione</a>'+(JSON.parse(localStorage.sp_e||'[]').length?'<a id="c2">Capitolo 2 · L\'Archivio dei Cursori</a>':'<a class="lk">Capitolo 2 · finisci il capitolo 1</a>')+(E3()?'<a id="c3">Capitolo 3 · Senza Volto</a>':'<a class="lk">Capitolo 3 · finisci il capitolo 2</a>')+'<a id="bk">← Indietro</a>';$('c1').onclick=()=>begin();if($('c2'))$('c2').onclick=()=>begin(cap2);if($('c3'))$('c3').onclick=()=>begin(cap3);$('bk').onclick=menu}
 menu();
 </script>
 </body>
