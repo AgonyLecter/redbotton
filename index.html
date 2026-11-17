@@ -42,6 +42,7 @@ body.hz .btn:before{content:"";position:absolute;left:-70%;right:-70%;bottom:-34
 .gh{position:fixed;left:0;top:0;opacity:0;pointer-events:none;z-index:15;transition:opacity 2s}
 .wh{position:fixed;z-index:16;pointer-events:none;color:#c33;font:italic 1.1rem Georgia,serif;opacity:0;animation:wf 3.2s}
 @keyframes wf{20%,60%{opacity:.7}}
+#rec{position:fixed;top:calc(8px + env(safe-area-inset-top));left:50%;width:9px;height:9px;margin-left:-4px;border-radius:50%;background:#f22;box-shadow:0 0 8px #f22;opacity:0;z-index:21;pointer-events:none}body.rec #rec{opacity:1;animation:bl 1.1s infinite}
 #hud{position:fixed;top:calc(10px + env(safe-area-inset-top));left:14px;font:11px/1.4 ui-monospace,monospace;letter-spacing:.12em;color:#8a8a95;z-index:20}
 body.hz #hud{color:#c33}
 #dlg{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(680px,calc(100vw - 24px));background:rgba(16,16,22,.92);color:#f2f2f5;border-radius:14px;padding:13px 18px 16px;backdrop-filter:blur(8px);box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;transition:opacity .3s;pointer-events:none;z-index:20}
@@ -78,7 +79,7 @@ body.hz #tag:before{background:#e33}
 <g class="hd"><ellipse cx="40" cy="21" rx="9.5" ry="13"/><circle class="ey" cx="36" cy="21" r="1.5"/><circle class="ey" cx="44" cy="21" r="1.5"/></g></g>
 <path d="M16 152l-1 15M19 152v17M22 152l1 15M58 152l-1 15M61 152v17M64 152l1 15" stroke="#33333f" stroke-width="1.2" fill="none"/></svg>
 <div id="veil"></div>
-<div id="hud"></div><div id="card"></div>
+<div id="rec"></div><div id="hud"></div><div id="card"></div>
 <div id="dlg"><div id="tag">NARRATORE</div><div id="txt"></div></div>
 <div class="ov" id="start">
   <div id="mt"><small>UN TEST DI OBBEDIENZA</small><h1>IL BOTTONE<br>ROSSO</h1></div>
@@ -95,7 +96,10 @@ const $=i=>document.getElementById(i),room=$('room'),txt=$('txt'),dlg=$('dlg'),t
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),rnd=(a,b)=>a+Math.random()*(b-a);
 const T=matchMedia('(pointer:coarse)').matches,v=(m,t)=>T?t:m;
 const uid=localStorage.sp_uid||(localStorage.sp_uid=Math.random().toString(36).slice(2,10));
-let muted=false,rebel=0,db=null,fb={},mode='off',bts=[],c={dodge:0,tele:0,split:0,all:0},tok=0,lastR=0,hint='',tester='0000',t0=0,pressed=false,who='Tester',ans={},tg=null,ghN=0;
+let muted=false,rebel=0,db=null,fb={},mode='off',bts=[],c={dodge:0,tele:0,split:0,all:0},tok=0,lastR=0,hint='',tester='0000',t0=0,pressed=false,who='Tester',ans={},tg=null,ghN=0,sw=0,batt=null;try{navigator.getBattery&&navigator.getBattery().then(b=>batt=b)}catch(e){}
+const pad=n=>String(n).padStart(2,'0'),clk=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())},UA=navigator.userAgent,
+DV=/iPhone/.test(UA)?'iPhone':/iPad/.test(UA)?'iPad':/Android/.test(UA)?'telefono Android':/Windows/.test(UA)?'computer Windows':/Mac/.test(UA)?'Mac':'dispositivo che non riconosco',
+vis=+localStorage.sp_v||0,vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};localStorage.sp_v=vis+1;
 const P={d:0,taps:0,mx:innerWidth/2,my:innerHeight/2,last:Date.now(),empty:0,clicks:[],blurAt:0},buf=[];
 const setTag=s=>tag.textContent=s;
 
@@ -115,12 +119,12 @@ function tone(f,d=.1,type='sine',vol=.06,sl=0){try{const a=AC(),o=a.createOscill
 function noise(d=.2,vol=.1,f=800){try{const a=AC(),n=a.sampleRate*d,b=a.createBuffer(1,n,a.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;
   const s=a.createBufferSource(),l=a.createBiquadFilter(),g=a.createGain();s.buffer=b;l.type='lowpass';l.frequency.value=f;g.gain.setValueAtTime(vol,a.currentTime);
   g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d);s.connect(l);l.connect(g);g.connect(mg);s.start()}catch(e){}}
-const S={tick:()=>tone(1000+Math.random()*300,.02,'square',.01),whoosh:()=>noise(.25,.12,2000),no:()=>tone(190,.2,'sawtooth',.05,-90),step:()=>noise(.13,.3,240),
-  click:()=>{tone(70,.4,'square',.12,-30);noise(.1,.2,3500)},thud:()=>tone(48,.6,'sine',.3,-18),glitch:()=>noise(.25,.14,7000),ok:()=>tone(520,.1,'triangle',.06)};
+const S={tick:()=>tone(1000+Math.random()*300,.02,'square',.01),whoosh:()=>noise(.25,.12,2000),no:()=>tone(190,.2,'sawtooth',.05,-90),step:()=>{noise(.13,.3,240);vib(45)},
+  click:()=>{tone(70,.4,'square',.12,-30);noise(.1,.2,3500)},thud:()=>{tone(48,.6,'sine',.3,-18);vib([120,40,60])},glitch:()=>{noise(.25,.14,7000);vib(25)},ok:()=>tone(520,.1,'triangle',.06)};
 function hum(f,vol,t=3){try{const a=AC();if(!hO){hO=a.createOscillator();const l=a.createBiquadFilter();l.type='lowpass';l.frequency.value=190;hG=a.createGain();hG.gain.value=0;
   hO.type='sawtooth';hO.frequency.value=50;hO.connect(l);l.connect(hG);hG.connect(mg);hO.start()}
   hO.frequency.linearRampToValueAtTime(f,a.currentTime+t);hG.gain.linearRampToValueAtTime(vol,a.currentTime+t)}catch(e){}}
-const beat=on=>{clearInterval(hb);if(on)hb=setInterval(()=>{tone(55,.16,'sine',.28);setTimeout(()=>tone(48,.2,'sine',.22),190)},1100)};
+const beat=on=>{clearInterval(hb);if(on)hb=setInterval(()=>{tone(55,.16,'sine',.28);vib([70,80,50]);setTimeout(()=>tone(48,.2,'sine',.22),190)},1100)};
 
 /* ===== Narratore ===== */
 function say(t,hold=700,cls=''){t=t.replace(/\{n\}/g,who);const my=++tok;dlg.style.opacity=1;txt.className=cls;txt.textContent='';
@@ -159,17 +163,20 @@ function hit(b){
   react(k)}
 
 /* ===== Presenze (cursori fantasma, figura, sussurri, polvere) ===== */
-const GH=[[2300,0],[5200,0],[3600,1]].map(([d,m])=>{const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('class','gh');s.setAttribute('width',22);s.setAttribute('height',22);s.setAttribute('viewBox','0 0 24 24');
-  s.innerHTML='<path d="M3 2l17 8-7 2-3 7z" fill="#eee" stroke="#222" stroke-width="1.5"/>';document.body.append(s);return{s,d,m,x:-50,y:-50}});
+const GH=[[2300,0],[5200,0],[3600,1],[7000,0],[4300,1],[6100,1],[8200,0],[1500,1]].map(([d,m],i)=>{const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('class','gh');s.setAttribute('width',22);s.setAttribute('height',22);s.setAttribute('viewBox','0 0 24 24');
+  s.innerHTML='<path d="M3 2l17 8-7 2-3 7z" fill="#eee" stroke="#222" stroke-width="1.5"/>';document.body.append(s);return{s,d,m,a:Math.PI*(i+.5)/8,x:-50,y:-50}});
 const showGh=n=>{ghN=n;GH.forEach((g,i)=>g.s.style.opacity=i<n?.6:0)};
 const showFig=(x,k)=>{if(x==null){fig.style.opacity=0;return}fig.style.left=x+'%';fig.style.setProperty('--k',k);fig.style.setProperty('--dy',((k-1)*14)+'vh');fig.classList.toggle('near',k>=1.5);fig.style.opacity=1};
 const WHISP=["non voltarti","è già qui","sei il prossimo","lui ti vede","non è il narratore","ascolta i passi"];
-setInterval(()=>{if(!document.body.classList.contains('hz')||mode==='off')return;const e=document.createElement('div');e.className='wh';e.textContent=WHISP[Math.floor(Math.random()*WHISP.length)];
-  e.style.left=rnd(8,70)+'%';e.style.top=rnd(12,60)+'%';document.body.append(e);noise(.5,.04,900);setTimeout(()=>e.remove(),3300)},9000);
+const wh=()=>{const a=[...WHISP,who+'…','sono le '+clk(),'ti vedo, '+who,DV+'…',batt?Math.round(batt.level*100)+'%':'respira piano',...(ans.conf?['«'+ans.conf+'»… lui l\'ha letta','lo sa. '+ans.conf]:[])];return a[Math.floor(Math.random()*a.length)]};
+setInterval(()=>{if(!document.body.classList.contains('hz')||mode==='off')return;const e=document.createElement('div');e.className='wh';e.textContent=wh();const nr=Math.random()<.5;
+  e.style.left=nr?Math.max(10,Math.min(innerWidth-150,P.mx+rnd(-70,40)))+'px':rnd(8,70)+'%';e.style.top=nr?Math.max(10,P.my-rnd(40,90))+'px':rnd(12,60)+'%';document.body.append(e);noise(.5,.04,900);setTimeout(()=>e.remove(),3300)},6500);
 const cv=$('dust'),cx=cv.getContext('2d'),M=Array.from({length:70},()=>({x:Math.random(),y:Math.random(),r:rnd(.6,2),s:rnd(.02,.07)}));
 const rs=()=>{cv.width=innerWidth;cv.height=innerHeight};rs();addEventListener('resize',rs);
 (function loop(){const n=Date.now();while(buf.length&&n-buf[0].t>9000)buf.shift();
-  GH.forEach((g,i)=>{if(i===0&&tg){g.x+=(tg.x-g.x)*.04;g.y+=(tg.y-g.y)*.04}else{const p=buf.find(q=>q.t>=n-g.d);if(p){g.x=g.m?innerWidth-p.x:p.x;g.y=p.y}}
+  GH.forEach((g,i)=>{if(g.go){g.x+=(g.go[0]-g.x)*.07;g.y+=(g.go[1]-g.y)*.07}else if(sw&&bts[0]){const bx=bts[0]._x,by=bts[0]._y-45,nr=Math.hypot(P.mx-bx,P.my-by)<200,Rr=(nr?30:75+(i%3)*14)+Math.sin(n/600+i)*7;
+    const k=nr?.13:.05;g.x+=(bx+Math.cos(g.a)*Rr*1.7-g.x)*k;g.y+=(by-8-Math.sin(g.a)*Rr*.9+(nr?Math.sin(n/150+i*2)*9:0)-g.y)*k}
+  else if(i===0&&tg){g.x+=(tg.x-g.x)*.04;g.y+=(tg.y-g.y)*.04}else{const p=buf.find(q=>q.t>=n-g.d);if(p){g.x=g.m?innerWidth-p.x:p.x;g.y=p.y}}
     g.s.style.transform=`translate(${g.x}px,${g.y}px)`});
   cx.clearRect(0,0,cv.width,cv.height);cx.fillStyle='rgba(140,140,155,.35)';
   M.forEach(m=>{m.y+=m.s/60;m.x+=Math.sin(m.y*9+m.r)*.0004;if(m.y>1)m.y=0;cx.beginPath();cx.arc(m.x*cv.width,m.y*cv.height,m.r,0,7);cx.fill()});
@@ -196,24 +203,38 @@ setInterval(()=>{if(mode==='off'||mode==='final'||mode==='still')return;const n=
     return R(pick('idle'))}},600);
 setInterval(()=>{if(!t0)return;const s=Math.floor((Date.now()-t0)/1000);$('hud').textContent='TEST DI ACCETTAZIONE · TESTER #'+tester+' · '+String(s/60|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0')},1000);
 
+/* ===== Interazioni extra: testo libero, messaggi nascosti alla torcia, tieni premuto ===== */
+const askT=(ph,mx=60)=>new Promise(r=>{const d=document.createElement('div');d.id='ch';d.innerHTML='<input id="nm" maxlength="'+mx+'" placeholder="'+ph+'" autocomplete="off"><button class="opt">Conferma</button>';dlg.append(d);dlg.style.pointerEvents='auto';
+  const go=()=>{const x=$('nm').value.trim();d.remove();dlg.style.pointerEvents='';r(x)};d.lastChild.onclick=go;$('nm').onkeydown=e=>e.key==='Enter'&&go();setTimeout(()=>$('nm').focus(),150)});
+async function hidden(arr){const els=arr.map(t=>{const e=document.createElement('div');e.textContent=t;e.style.cssText='position:fixed;z-index:11;pointer-events:none;color:#f55;font:italic 1.3rem Georgia,serif;opacity:0;text-shadow:0 0 8px #000;max-width:70vw;left:'+rnd(8,40)+'%;top:'+rnd(14,52)+'%';document.body.append(e);return{e,t:0,f:0}});
+  const hn=setTimeout(()=>say("Più piano. La torcia deve restare ferma sulle parole.",200,'gl'),16000);
+  await new Promise(res=>{const iv=setInterval(()=>{let all=1;els.forEach(o=>{const r=o.e.getBoundingClientRect(),d=Math.hypot(P.mx-(r.left+r.width/2),P.my-(r.top+r.height/2)),k=Math.max(0,1-d/170);
+    if(o.f){o.e.style.opacity=.9;return}all=0;o.e.style.opacity=k;if(k>.65)o.t+=100;else o.t=Math.max(0,o.t-60);if(o.t>1100){o.f=1;S.glitch();vib(70)}});if(all){clearInterval(iv);res()}},100)});
+  clearTimeout(hn);await sleep(1800);els.forEach(o=>{o.e.style.transition='opacity 2s';o.e.style.opacity=0;setTimeout(()=>o.e.remove(),2100)})}
+let dn=0;addEventListener('pointerdown',()=>dn=1);addEventListener('pointerup',()=>dn=0);addEventListener('pointercancel',()=>dn=0);
+async function holdFor(ms,brk){let h=0;while(h<ms){await sleep(100);if(dn){h+=100;if(h%700===0){vib(60);S.step()}}else if(h>0){h=0;await brk()}}}
 async function card(t){const e=$('card');e.innerHTML=t;e.style.opacity=1;await sleep(3300);e.style.opacity=0;await sleep(1400)}
 /* ===== CAPITOLO 1 · Il Test di Accettazione ===== */
 async function cap1(){
   let n=0;if(db){try{n=(await fb.get(fb.ref(db,'stanza/globale/tentativi'))).val()||0}catch(e){}}
-  tester=String(n+1).padStart(4,'0');t0=Date.now();hum(52,.03,4);
+  tester=String(n+1).padStart(4,'0');t0=Date.now();localStorage.sp_t=tester;hum(52,.03,4);
   await card('CAPITOLO 1<br><small style="letter-spacing:.18em;opacity:.55;font-size:.8em">IL TEST DI ACCETTAZIONE</small>');
   await sleep(300);
   await say("Benvenuto. Accomodati pure, non c'è fretta.");
   await say("Questo è il Test di Accettazione. Una sola prova, un solo compito.");
   await say("Prima di iniziare devo registrarti. Come ti chiami?",100);
-  who=await askName();
+  who=await askName();localStorage.sp_name=who;
   await say("{n}. Bel nome. Lo terrò da parte.");
+  if(vis>0)await say(`Aspetta. Questo posto lo conosci già. Sei entrato ${vis} ${vis>1?'volte':'volta'} prima di adesso. Pensavi non lo sapessi?`,500);
+  await say(`Da te sono le ${clk()}. `+((new Date).getHours()<5||(new Date).getHours()>=23?"A quest'ora nessuno entra qui per caso.":"Un orario tranquillo. Per ora."));
   await say("Primo esercizio, per scaldarci: non toccare nulla per cinque secondi.",200);
   mode='still';let h=0,rb=0,d0=P.d,t1=P.taps;
   while(h<5000){await sleep(100);if(P.d-d0>30||P.taps>t1){rb++;h=0;d0=P.d;t1=P.taps;say(["Ho detto di non toccare nulla.","Di nuovo. Si vede che ti piace disobbedire.","Va bene. Ricominciamo. Io ho tempo.","Sei un ribelle, {n}. Mi piace. Mi preoccupa un po'."][Math.min(rb-1,3)],300)}else h+=100}
   mode='off';rebel=rb;
   await say(rb?"Ce l'hai fatta, dopo "+rb+(rb===1?" errore":" errori")+". Prendo nota.":"Perfetto. Obbedienza assoluta. Prendo nota.");
   if(n>0)await say("Prima di te, qui dentro, ci sono stati "+n+" tentativi.");
+  await say(`Vedo che usi un ${DV}.`+(T?" Lo tieni in mano. Lo sento caldo.":" Ti vedo muovere il cursore."),400);
+  if(batt)await say(batt.charging?"Sei collegato alla corrente. Così non si spegne. Pensi a tutto, tu.":`Ti resta il ${Math.round(batt.level*100)}% di batteria. Basterà. Credo.`,400);
   mk(innerWidth/2,innerHeight*.66);
   await say("In fondo alla stanza c'è un bottone rosso. Premilo e il test è concluso.");
   await say(v("Avvicinati: muovi il mouse verso il bottone.","Avvicinati: tocca lo schermo vicino al bottone."),300);
@@ -229,6 +250,9 @@ async function cap1(){
   await say("Domanda due. Prima di entrare, eri solo?",100);
   ans.q2=await choose(["Sì","No","Non ricordo"]);
   await say(["Ne sei sicuro?","Questo mi interessa molto.","Capita. Dopo un po' qui dentro capita a tutti."][ans.q2]);
+  await say("Ultima domanda, ed è l'unica che conta. Scrivi una cosa che non hai mai detto a nessuno. Resterà tra noi.",100);
+  ans.conf=await askT("Scrivila qui…");localStorage.sp_conf=ans.conf;
+  await say(ans.conf?"Capito. Non la dirò a nessuno. Ma le cose scritte qui dentro, qualcuno le legge.":"Il silenzio è già una risposta. La annoto lo stesso.",600);
 
   await say(v("Nuova versione: il bottone resta fermo e si lascia cliccare. Prova.","Nuova versione: il bottone resta fermo e si lascia toccare. Prova."));
   mode='tele';await until(()=>c.tele>=4);mode='off';
@@ -243,10 +267,11 @@ async function cap1(){
   await say("Hai fatto una cosa che nessun altro aveva fatto: sei ancora qui.",500,'gl');
   await say("{n}, non chiudere la pagina. Ti prego.",500,'gl');
   showGh(1);
-  await say(v("Vedi quel cursore pallido che ti segue? Non guardarlo.","Vedi quel puntino pallido che segue il tuo dito? Non guardarlo.")+" Ti imita da quando sei entrato.",700,'gl');
+  await say(v("Vedi quel cursore pallido che ti segue? Non guardarlo.","Vedi quel cursore pallido che segue il tuo dito? Non guardarlo.")+" Ti imita da quando sei entrato.",700,'gl');
   if(ans.q1===0)await say("Mi avevi detto di sentirti osservato. Avevi ragione.",500,'gl');
   if(ans.q1===1)await say("Mi avevi detto di non sentirti osservato. Adesso lo senti, vero?",500,'gl');
   await say("Non sei solo. E non sono io il solo che parla in questa stanza.",600,'gl');
+  document.body.classList.add('rec');S.glitch();await say("Vedi la lucina rossa in alto? Non l'ho accesa io. Non so chi l'abbia accesa.",700,'gl');
 
   /* presenza: devi restare fermo */
   showGh(2);await say("Aspetta. Hai sentito?",300,'gl');for(let i=0;i<3;i++){S.step();await sleep(700)}
@@ -260,6 +285,9 @@ async function cap1(){
   await say("Bravo. Se n'è andato. Per ora.",500,'gl');
   await say("Quello era il vero ospite di questa stanza. Io sono solo quello che parla.",600,'gl');
 
+  await say(v("Muovi il mouse","Muovi il dito")+" sulle pareti, piano. Qualcuno ha scritto qualcosa per te, al buio.",300,'gl');
+  await hidden(["non fidarti di lui",who+", sei qui da troppo tempo","non è il suo primo test",...(ans.conf?['«'+ans.conf+'» — lo sapevamo']:[])]);
+  await say("Le hai trovate. Le ho scritte io. Credo. Non ricordo di averle scritte.",600,'gl');
   /* confessione */
   await say(rebel>=2?"Ribelle fino alla fine. Per questo ti ho voluto qui.":"Hai sempre obbedito, fin dal primo esercizio. Anche questo mi spaventa.",600,'gl');
   await say("Ora che siamo soli, posso dirti la verità.",500,'gl');
@@ -268,19 +296,19 @@ async function cap1(){
   await say("Prende il posto di chi parla. Io ero il tester numero uno. Ho premuto. Da allora parlo.",800,'gl');
   await say("Tu hai ancora un nome, {n}. Io non ricordo più il mio. Ricordo solo il rumore del click.",800,'gl');
   showGh(3);
-  await say("Quei puntini sono tester che non hanno mai premuto. Restano qui, come me, e ripetono i tuoi movimenti.",800,'gl');
+  await say("Quei cursori sono tester che non hanno mai premuto. Restano qui, come me, e ripetono i tuoi movimenti.",800,'gl');
   await say("Ti ho fatto inseguire il bottone per non restare solo. Mi dispiace. Non abbastanza.",800,'gl');
   await say("Ora è fermo. Puoi premerlo e io potrò tacere. Oppure puoi restare qui con me.",700,'gl');
   await say("Scegli tu. Ma scegli.",300,'gl');
-  mode='final';beat(true);hum(34,.08,4);
-  const t=Date.now(),W=[[9000,"Ti guardo. Non ho altro da fare."],[19000,"Se lo premi non fa male. Credo."],[30000,"…Quindi resti. Va bene."]];let i=0;
-  while(!pressed){await sleep(300);const e=Date.now()-t;if(pressed)break;if(i<W.length&&e>W[i][0])say(W[i++][1],300,'gl');if(e>36000)break}
+  mode='final';sw=1;showGh(8);beat(true);hum(34,.08,4);vib([200,100,200]);
+  const t=Date.now(),W=[[4500,"Guarda. Sono arrivati tutti. Non li avevo mai visti così vicini."],[11000,"Otto cursori. Otto che non hanno premuto. Ognuno aspettava qualcuno come te."],[18000,"Ti guardo, {n}. Non ho altro da fare."],[25000,"Se lo premi non fa male. Credo."],[32000,"…Quindi resti. Va bene. Vieni a stare con loro."]];let i=0;
+  while(!pressed){await sleep(300);const e=Date.now()-t;if(pressed)break;if(i<W.length&&e>W[i][0])say(W[i++][1],300,'gl');if(e>40000)break}
   if(!pressed)endB();
 }
-async function ending(lines,light,k){const E=JSON.parse(localStorage.sp_e||'[]');if(!E.includes(k)){E.push(k);localStorage.sp_e=JSON.stringify(E)}lines=[...lines.slice(0,-1),'FINALE «'+k+'» · TROVATI '+E.length+' SU 2',...lines.slice(-1)];const e=$('end');if(light){e.style.background='#fff';e.style.color='#333'}e.style.display='flex';e.style.opacity=0;e.style.transition='opacity 4s';
+async function ending(lines,light,k){const E=JSON.parse(localStorage.sp_e||'[]');if(!E.includes(k)){E.push(k);localStorage.sp_e=JSON.stringify(E)}lines=[...lines.slice(0,-1),'FINALE «'+k+'» · TROVATI '+E.length+' SU 4',...lines.slice(-1)];const e=$('end');if(light){e.style.background='#fff';e.style.color='#333'}e.style.display='flex';e.style.opacity=0;e.style.transition='opacity 4s';
   requestAnimationFrame(()=>e.style.opacity=1);await sleep(4300);dlg.style.opacity=0;for(const l of lines){$('elog').innerHTML+=l+'<br>';await sleep(1800)}$('ebtn').style.opacity=1}
 async function press(b){
-  mode='off';pressed=true;beat(false);b.classList.add('pressed');S.click();setTimeout(S.thud,150);room.classList.add('shake');save({cap1:'premuto',completato:true});await sleep(1000);
+  mode='off';sw=0;pressed=true;beat(false);b.classList.add('pressed');S.click();setTimeout(S.thud,150);room.classList.add('shake');save({cap1:'premuto',completato:true});await sleep(1000);
   veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;showGh(0);showFig();hum(30,.0,2);
   await say("Grazie.",800);await say("Dopo tutto questo tempo qualcuno lo ha premuto. Ora posso tacere.",900);await say("Il rumore del click. Era proprio così.",1300);
   setTag('SISTEMA');await say("ESITO: ACCETTATO. RUOLO ASSEGNATO: NARRATORE.",900);
@@ -304,17 +332,70 @@ async function press(b){
   await say("La voce, adesso, è la tua.",900);
   ending(["Dall'altra parte, qualcuno ti sta ascoltando.","Ricordi come si comincia?","","Benvenuto. Accomodati pure, non c'è fretta.","","FINE CAPITOLO 1 · IL TEST DI ACCETTAZIONE"],true,'Il Rimpiazzo');
 }
+/* ===== CAPITOLO 2 · L'Archivio dei Cursori ===== */
+const sp=t=>{if(muted)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/\{n\}/g,who));u.lang='it-IT';u.pitch=.1;u.rate=.75;speechSynthesis.speak(u)}catch(e){}};
+const tap=()=>new Promise(r=>{const h=e=>{if(e.target.closest('#dlg'))return;removeEventListener('pointerdown',h);r()};addEventListener('pointerdown',h)});
+async function cap2(){
+  who=localStorage.sp_name||'Tester';tester=localStorage.sp_t||'0000';t0=Date.now();hum(44,.03,4);
+  await card('CAPITOLO 2<br><small style="letter-spacing:.18em;opacity:.55;font-size:.8em">L\'ARCHIVIO DEI CURSORI</small>');
+  setTag('TU · NARRATORE');
+  await say(JSON.parse(localStorage.sp_e||'[]').includes('La Compagnia')?"Sei rimasto con loro, {n}. Ora lo sai: restare è un modo di premere.":"Hai premuto, {n}. Ora parli tu. Ma questa è la parte che non ti hanno detto.",600);
+  await say("Il narratore non sceglie le parole. Le eredita. Ogni frase che dici è già stata detta da qualcuno.",700);
+  await say("Ti mostro dove le tengono. Si chiama Archivio. Apriamo il tuo fascicolo.",500);
+  setTag('ARCHIVIO · FASCICOLO');
+  const f=['NOME: '+who,'TESTER: #'+tester,'DISPOSITIVO: '+DV,'ORA LOCALE: '+clk(),batt?'BATTERIA: '+Math.round(batt.level*100)+'%':'BATTERIA: non dichiarata','ENTRATE: '+(vis+1),'LINGUA: '+navigator.language,'CONFESSIONE: '+(localStorage.sp_conf||'—'),'SCHERMO: '+innerWidth+'×'+innerHeight];
+  for(const l of f){S.glitch();await say(l,150)}
+  setTag('TU · NARRATORE');
+  await say("Compilato prima che arrivassi. Il microfono è spento. Mi basta il tuo silenzio.",700);
+  await say("Ora un gioco. A ogni domanda, la tua risposta è già in una busta chiusa.",500);
+  for(const [q,o] of [["Hai mai pensato di chiudere la pagina?",["Sì","No"]],["Scegli un numero.",["1","2","3"]],["Ultima. Cosa farai adesso?",["Premere","Aspettare","Non scegliere"]]]){
+    await say(q,100);const x=await Promise.race([choose(o),sleep(13000).then(()=>-1)]);
+    if(x<0){const d=$('ch');d&&d.remove();dlg.style.pointerEvents='';await say("Non rispondere. Era scritto nella busta.",500);continue}
+    await say('Apro la busta: «'+o[x]+'». Lo sapevo. Lo so sempre.',500)}
+  await say("Non è magia. Tu scegli, io scrivo dopo. Il trucco è che credi di scegliere prima.",800);
+  await say("Capita anche a me. Ogni parola che dico, l'ho già sentita.",800);
+  document.body.classList.add('hz','rec');$('door').classList.add('open');veil.classList.add('fl');hum(36,.07,3);
+  for(let i=0;i<7;i++){veil.style.opacity=i%2?0:.9;S.glitch();await sleep(90+Math.random()*120)}veil.style.opacity='';
+  const b=mk(innerWidth/2,innerHeight*.7);sw=1;showGh(8);beat(true);
+  await say("Eccoli. Gli otto del capitolo uno. Non sono tester: sono voci che aspettano di finire la frase.",700,'gl');
+  await say(v("Clicca ovunque","Tocca lo schermo")+" e ne mando uno al bottone. Quando preme, parla.",300,'gl');
+  mode='still';
+  const V=["Finalmente. Che rumore bello.","Credevo di essere solo io. Siamo tanti.","Mi chiamavo Elia. Il nome sta già svanendo.","Non fa male. Fa eco.","Chi tocca, chi preme, chi parla: è sempre la stessa mano.","Il bottone non è un bottone. È una bocca.","Anche tu hai già premuto, {n}. Tanto tempo fa.","Siamo la voce che hai sentito nel capitolo uno."];
+  for(let i=0;i<8;i++){await tap();const g=GH[i];g.go=[b._x,b._y-45];S.whoosh();await sleep(1100);g.s.style.opacity=0;b.classList.add('pressed');S.click();setTimeout(()=>b.classList.remove('pressed'),200);
+    setTag('TESTER #'+String(i+2).padStart(4,'0'));sp(V[i]);await say(V[i],700,'gl')}
+  sw=0;beat(false);setTag('TU · NARRATORE');
+  await say("Otto voci. Nessuna è finita. Il bottone le contiene tutte e le dice a chi lo preme.",800,'gl');
+  await say("Per questo parlavo così, {n}. Non ero io. Ero loro, in fila.",800,'gl');
+  await say("E ora chi ascolta te? Guarda la lucina rossa in alto. Non ho mai saputo chi fosse.",900,'gl');
+  await say("Prima di aprire la porta: la torcia. Cerca sulle pareti. Gli otto hanno lasciato qualcosa.",300,'gl');
+  await hidden(["premi","non premere","siamo ancora qui","ti guarda dal telefono",who+" ascolta",...(localStorage.sp_conf?['«'+localStorage.sp_conf+'»']:[])]);
+  await say("Ognuno ha scritto l'opposto dell'altro. Così nessuno può obbedire. Nemmeno tu.",700,'gl');
+  await say("Un'ultima cosa. "+v("Tieni premuto il tasto del mouse","Appoggia il dito sullo schermo")+" e non staccarlo finché non ti dico.",300,'gl');
+  let hf=0;await holdFor(7000,()=>say(["Non staccarlo.","Si è accorto di te. Ancora.","Ti prego, {n}. Ancora."][Math.min(hf++,2)],200,'gl'));
+  vib([150,80,150,80,300]);await say("Ecco. Quel battito non è il tuo. Ma adesso battono insieme.",900,'gl');
+  await say("La porta è aperta. Entra e sarai la voce. Resta e sarai l'archivio.",400,'gl');
+  const z=await choose(["Entra","Resta"]);
+  hum(30,0,2);veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;
+  const T3=["","FINE CAPITOLO 2 · L'ARCHIVIO DEI CURSORI","CAPITOLO 3 · COMING SOON"];
+  if(z===0){sp("Benvenuto, "+who);await say("Dall'altra parte c'è già qualcuno. Ha il tuo nome. Sta per parlare.",900);
+    ending(["Hai varcato la porta.","Nella stanza bianca c'è un bottone rosso e un tester nuovo.","Apre bocca. Parla con la tua voce. Tu non hai deciso nulla.",...T3],true,'La Voce')}
+  else{showGh(0);await say("Resta. Il fascicolo si aggiorna da solo.",900);
+    ending(["FASCICOLO AGGIORNATO","NOME: "+who+" · "+DV+" · "+clk(),"STATO: ARCHIVIATO","Ultima voce registrata: la tua.",...T3],false,"L'Archivio")}
+}
 async function endB(){
-  mode='off';beat(false);save({cap1:'atteso',completato:true});bts[0].style.opacity=0;veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;showGh(0);hum(30,0,3);
+  mode='off';beat(false);save({cap1:'atteso',completato:true});bts[0].style.opacity=0;veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;hum(30,0,3);
   await say("Grazie. Resta.",1400);
-  ending(["ESITO: NESSUNO","Il test non è mai finito.","TESTER #"+tester+" · SESSIONE IN CORSO","","FINE CAPITOLO 1 · IL TEST DI ACCETTAZIONE"],false,'La Compagnia');
+  ending(["ESITO: NESSUNO","Il test non è mai finito.","Nella stanza c'è un cursore in più. Il suo nome era "+who+".","Ora aspetta, insieme agli altri.","TESTER #"+tester+" · SESSIONE IN CORSO","","FINE CAPITOLO 1 · IL TEST DI ACCETTAZIONE"],false,'La Compagnia');
 }
 const mq=$('mq'),mn=$('mn'),MQ=["Non hai ancora iniziato e già mi fai aspettare.","Il bottone è lì, a destra. Fa finta di niente.","Puoi restare nel menù quanto vuoi. Io ho tempo. Troppo.","Tutti iniziano. Pochissimi finiscono. Nessuno ricorda come.","Se senti dei passi, è la ventilazione. Probabilmente."];let mqi=0;
 const mqs=()=>{mq.style.opacity=0;setTimeout(()=>{mq.textContent=MQ[mqi++%MQ.length];mq.style.opacity=1},500)};mqs();const mqt=setInterval(mqs,7000);
 mk(innerWidth*.74,innerHeight*.7);
-const begin=async()=>{clearInterval(mqt);$('start').style.display='none';bts.forEach(b=>b.remove());bts=[];AC();S.ok();await initFB();presence();cap1()};
-function menu(){mn.innerHTML='<a id="go">Inizia il test</a><a id="chs">Capitoli</a><a id="snd">Audio: '+(muted?'spento':'attivo')+'</a>';$('go').onclick=begin;$('chs').onclick=chap;$('snd').onclick=()=>{muted=!muted;if(mg)mg.gain.value=muted?0:1;menu()}}
-function chap(){mn.innerHTML='<a id="c1">Capitolo 1 · Il Test di Accettazione</a><a class="lk">Capitolo 2 · in arrivo</a><a id="bk">← Indietro</a>';$('c1').onclick=begin;$('bk').onclick=menu}
+const T0=document.title;document.addEventListener('visibilitychange',()=>{document.title=document.hidden&&t0?['Dove vai?','Torna qui.',who+'...','Ti aspetto.'][Math.floor(Math.random()*4)]:T0});
+addEventListener('offline',()=>t0&&say("Hai tolto la connessione. Credi che serva? Sono già dentro.",300,'gl'));
+matchMedia('(orientation:portrait)').addEventListener('change',()=>t0&&say("Hai girato lo schermo. Cerchi un'altra angolazione? Non ce n'è.",300,'gl'));
+const begin=async f=>{history.pushState(null,'');addEventListener('popstate',()=>{history.pushState(null,'');t0&&say("Indietro non esiste, {n}.",300,'gl')});clearInterval(mqt);$('start').style.display='none';bts.forEach(b=>b.remove());bts=[];AC();S.ok();await initFB();presence();(typeof f==='function'?f:cap1)()};
+function menu(){mn.innerHTML='<a id="go">Inizia il test</a><a id="chs">Capitoli</a><a id="snd">Audio: '+(muted?'spento':'attivo')+'</a>';$('go').onclick=()=>begin();$('chs').onclick=chap;$('snd').onclick=()=>{muted=!muted;if(mg)mg.gain.value=muted?0:1;menu()}}
+function chap(){mn.innerHTML='<a id="c1">Capitolo 1 · Il Test di Accettazione</a>'+(JSON.parse(localStorage.sp_e||'[]').length?'<a id="c2">Capitolo 2 · L\'Archivio dei Cursori</a>':'<a class="lk">Capitolo 2 · finisci il capitolo 1</a>')+'<a class="lk">Capitolo 3 · coming soon</a><a id="bk">← Indietro</a>';$('c1').onclick=()=>begin();if($('c2'))$('c2').onclick=()=>begin(cap2);$('bk').onclick=menu}
 menu();
 </script>
 </body>
