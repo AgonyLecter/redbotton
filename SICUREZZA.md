@@ -46,3 +46,27 @@ Carica sempre la versione di `dist/`, non l'`index.html` del repository.
 
 Ricorda di rendere **privato** il repository GitHub (o di non linkarlo): altrimenti il codice
 leggibile è comunque lì.
+
+## Il narratore che risponde (IA) — facoltativo
+Il pulsante **PARLA** e le domande aperte funzionano sempre: senza IA risponde un motore
+interno che usa solo fatti veri (ora, minuti di gioco, finali, frasi scritte prima).
+Per farlo rispondere con un'intelligenza artificiale (Claude):
+
+1. Crea una chiave API su https://console.anthropic.com (sezione *API Keys*).
+2. Su **Vercel → il progetto → Settings → Environment Variables** aggiungi
+   `ANTHROPIC_API_KEY` = la tua chiave (ambiente *Production*), poi rifai il deploy.
+   La chiave resta sul server, nel file `api/narratore.js`: **non finisce mai nel gioco**.
+3. Per la versione **itch.io**, metti l'indirizzo completo nella costante `NARR_URL`
+   in `index.html`, ad esempio `https://il-tuo-sito.vercel.app/api/narratore`, e rifai lo zip.
+   Se usi un dominio tuo (non `.vercel.app`), aggiungi su Vercel anche
+   `SITE_HOST` = il tuo dominio (es. `gioco.miosito.it`).
+
+Protezioni già attive: la funzione accetta richieste solo da itch.io, da `*.vercel.app`
+e da `SITE_HOST`; massimo 8 messaggi al minuto per indirizzo; massimo 30 risposte IA per
+partita; testi tagliati a 400 caratteri. Il narratore riceve solo quello che il giocatore
+scrive al narratore e pochi fatti di gioco (nome, capitolo, ora, minuti, finali), mai la posizione
+o altri dati. Se il giocatore scrive frasi su farsi del male, il gioco **non** le manda all'IA:
+esce dal personaggio e mostra Telefono Amico (02 2327 2327) e il 112.
+
+Costo indicativo con il modello attuale (`claude-opus-5-5`): circa mezzo centesimo di dollaro a
+risposta. Puoi mettere un tetto di spesa mensile nella console di Anthropic (*Limits*).
