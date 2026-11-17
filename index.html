@@ -59,14 +59,12 @@ body.hz #tag:before{background:#e33}
 #end{display:none;background:#000;color:#9fd;font:14px/1.9 ui-monospace,monospace;z-index:40}
 #eacts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:30px;opacity:0;transition:opacity 1.2s;max-width:640px}
 #eacts .big{font-family:inherit;color:inherit}#eacts .big.main{background:#c00;border-color:#c00;color:#fff;font-weight:600}
-#talkb{position:fixed;right:12px;top:calc(8px + env(safe-area-inset-top));z-index:23;font:600 11px system-ui,sans-serif;letter-spacing:.16em;color:#fff;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:8px 13px;display:none;cursor:pointer;backdrop-filter:blur(4px)}
-#talkb.on{display:block;animation:tbin .5s}@keyframes tbin{from{opacity:0;transform:translateY(-6px)}}#talkb:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#e33;margin-right:7px;vertical-align:1px;animation:bl 1.6s infinite}
 #boot{position:fixed;inset:0;z-index:70;background:#000;color:#bbb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center;padding:24px;cursor:pointer;transition:opacity 1.6s;font:13px/2 ui-monospace,monospace;letter-spacing:.25em}
 #boot b{display:block;width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 40% 32%,#ff7a7a,#d00 52%,#4a0000);box-shadow:0 0 30px rgba(255,0,0,.45);animation:bpul 2.4s ease-in-out infinite}
 @keyframes bpul{50%{box-shadow:0 0 60px rgba(255,0,0,.8);transform:scale(1.06)}}
 #boot u{text-decoration:none;color:#fff;font-size:14px;animation:bl 1.6s infinite}#boot i{font-style:normal;opacity:.55;font-size:11px}
 #mn a{position:relative}#mn a:not(.lk):hover:before{content:"";position:absolute;left:-14px;top:50%;width:7px;height:7px;margin-top:-3px;border-radius:50%;background:#c00}
-#coach{position:fixed;left:50%;top:calc(46px + env(safe-area-inset-top));transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:9px 16px 9px 10px;border-radius:30px;background:rgba(0,0,0,.66);border:1px solid rgba(255,255,255,.25);color:#fff;font:600 12px/1.35 system-ui,sans-serif;letter-spacing:.08em;z-index:22;opacity:0;transition:opacity .4s;pointer-events:none;width:max-content;max-width:calc(100vw - 24px)}
+#coach{position:fixed;left:50%;top:calc(34px + env(safe-area-inset-top));transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:9px 16px 9px 10px;border-radius:30px;background:rgba(0,0,0,.66);border:1px solid rgba(255,255,255,.25);color:#fff;font:600 12px/1.35 system-ui,sans-serif;letter-spacing:.08em;z-index:22;opacity:0;transition:opacity .4s;pointer-events:none;width:max-content;max-width:calc(100vw - 24px)}
 #coach.on{opacity:1;animation:cpul 2.2s infinite}@keyframes cpul{50%{box-shadow:0 0 0 4px rgba(255,255,255,.12)}}
 #cico{position:relative;width:48px;height:30px;flex:none}
 #cico i,#cico b{position:absolute;top:50%;left:50%;border-radius:50%}
@@ -95,7 +93,7 @@ body.hz #tag:before{background:#e33}
 <div id="room"></div>
 <div id="veil"></div>
 <canvas id="fx"></canvas><div id="cue"></div><div id="rec"></div><div id="hud"></div><div id="card"></div>
-<button id="talkb">PARLA</button><div id="coach"><div id="cico"><i></i><b></b></div><div><span id="ctxt"></span><span id="cbar"></span></div></div><div id="breath"></div><div id="me"></div><svg id="hunt" viewBox="0 0 24 24"><path d="M3 2l17 8-7 2-3 7z" fill="#0b0b0e" stroke="#eee" stroke-width="1.3"/></svg>
+<div id="coach"><div id="cico"><i></i><b></b></div><div><span id="ctxt"></span><span id="cbar"></span></div></div><div id="breath"></div><div id="me"></div><svg id="hunt" viewBox="0 0 24 24"><path d="M3 2l17 8-7 2-3 7z" fill="#0b0b0e" stroke="#eee" stroke-width="1.3"/></svg>
 <div id="js"><svg viewBox="0 0 400 400" aria-hidden="true"><defs><radialGradient id="jh" cx="50%" cy="38%" r="60%"><stop offset="0" stop-color="#16161a"/><stop offset=".6" stop-color="#060607"/><stop offset="1" stop-color="#000"/></radialGradient><filter id="jb"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
 <path d="M40 400 C60 300 120 270 200 268 C280 270 340 300 360 400Z" fill="#020203"/>
 <ellipse cx="200" cy="165" rx="92" ry="130" fill="url(#jh)" stroke="#000" stroke-width="3" filter="url(#jb)"/>
@@ -117,8 +115,6 @@ databaseURL:"https://wandernaturelogin-default-rtdb.europe-west1.firebasedatabas
 storageBucket:"wandernaturelogin.firebasestorage.app",messagingSenderId:"347933923936",appId:"1:347933923936:web:cc34ca02d7247970ff8105"};
 /* Chiave reCAPTCHA v3 per Firebase App Check (facoltativa ma consigliata: vedi SICUREZZA.md). Vuota = App Check spento. */
 const APPCHECK_KEY="";
-/* Indirizzo del narratore IA quando il gioco gira su itch.io (es. "https://tuo-sito.vercel.app/api/narratore"). Vuoto = solo motore locale. */
-const NARR_URL="https://redbotton.vercel.app/api/narratore";
 
 const $=i=>document.getElementById(i),room=$('room'),txt=$('txt'),dlg=$('dlg'),tag=$('tag'),veil=$('veil');
 /* ===== Schermo intero: i browser lo concedono solo dopo un tocco o un clic, quindi lo chiediamo al primo tocco
@@ -193,12 +189,14 @@ function say0(t,hold=700,cls=''){t=t.replace(/\{n\}/g,who);const my=++tok;sayTok
     if(i<t.length)setTimeout(k,/[.,…?]/.test(t[i-1])?170:26);else setTimeout(res,hold+t.length*24)})()})}
 let busy=0,lastSay=Date.now(),G={};
 let sayArgs=null,sayTok=0;
-const say=async(...a)=>{while(talking)await sleep(150);busy++;sayArgs=a;sayLive=1;try{return await say0(...a)}finally{sayLive=0;busy--;lastSay=Date.now()}};
+const say=async(...a)=>{while(talking)await sleep(150);
+  if(obsQ.length&&!sayingObs){const l=obsQ.shift();sayingObs=1;busy++;try{await say0(l,500,document.body.classList.contains('hz')?'gl':'')}finally{busy--;sayingObs=0}}
+  busy++;sayArgs=a;sayLive=1;try{return await say0(...a)}finally{sayLive=0;busy--;lastSay=Date.now()}};
 const guide=(l,ok,tg)=>{G={l,ok,tg,i:0,s:Date.now(),f:0}};
 const BT=()=>bts[0]?[bts[0]._x,bts[0]._y]:null;
 const until=(f,h,tg)=>new Promise(r=>{if(h)guide(h,()=>!f(),tg);const i=setInterval(()=>{if(f()){clearInterval(i);r()}},100)});
 function choose(opts){return (async()=>{while(talking)await sleep(150)})().then(()=>new Promise(r=>{const d=document.createElement('div');d.id='ch';const t1=Date.now();
-  opts.forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;b.onclick=()=>{S.ok();ans.rt=Date.now()-t1;d.remove();dlg.style.pointerEvents='';r(i)};d.append(b)});
+  opts.forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;b.onclick=()=>{S.ok();ans.rt=Date.now()-t1;try{noteChoice(i,opts.length,ans.rt)}catch(e){}d.remove();dlg.style.pointerEvents='';r(i)};d.append(b)});
   dlg.append(d);dlg.style.pointerEvents='auto'}))}
 function askName(){return new Promise(r=>{const d=document.createElement('div');d.id='ch';d.innerHTML='<input id="nm" maxlength="14" placeholder="Scrivi il tuo nome" autocomplete="off"><button class="opt">Conferma</button>';
   dlg.append(d);dlg.style.pointerEvents='auto';const go=()=>{const x=$('nm').value.trim()||'Tester';d.remove();dlg.style.pointerEvents='';r(x)};
@@ -514,7 +512,7 @@ function touchAt(x,y){P.last=Date.now();P.mx=x;P.my=y;buf.push({t:P.last,x,y})}
 addEventListener('pointermove',e=>{P.d+=Math.hypot(e.clientX-P.mx,e.clientY-P.my);touchAt(e.clientX,e.clientY);
   if(t0&&P.last-trT>110){trT=P.last;trail.push([Math.round(e.clientX/innerWidth*999),Math.round(e.clientY/innerHeight*999)]);if(trail.length>320)trail.shift()}
   if(mode==='dodge')for(const b of bts)if(Math.hypot(b._x-e.clientX,b._y-e.clientY)<Math.max(120,b._r*1.7))flee(b,e.clientX,e.clientY)});
-addEventListener('pointerdown',e=>{if(e.target.closest('#talkb'))return;touchAt(e.clientX,e.clientY);if(mode==='off'||e.target.closest('.ov,#dlg'))return;const n=Date.now();P.taps++;
+addEventListener('pointerdown',e=>{touchAt(e.clientX,e.clientY);if(mode==='off'||e.target.closest('.ov,#dlg'))return;const n=Date.now();P.taps++;
   P.clicks=P.clicks.filter(t=>n-t<2500);P.clicks.push(n);const b=btAt(e.clientX,e.clientY);if(b)return hit(b);
   if(mode==='dodge'){const nb=bts.find(b=>Math.hypot(b._x-e.clientX,b._y-e.clientY)<Math.max(130,b._r*1.8));if(nb)return flee(nb,e.clientX,e.clientY)}
   P.empty++});
@@ -571,11 +569,12 @@ async function cap1(){
   who=await askName();localStorage.sp_name=who;
   await say("{n}. Bel nome. Lo terrò da parte.");
   if(vis>0)await say(`Aspetta. Questo posto lo conosci già. Sei entrato ${vis} ${vis>1?'volte':'volta'} prima di adesso.`+(last?(NOW0-last<12e4?" L'ultima pochi istanti fa. Così in fretta? Non riuscivi a stare lontano.":` L'ultima ${ago()} fa.`):'')+" Pensavi non lo sapessi?",500);
+  if(vis>0){const m=memLine();if(m)await say(m,600)}
   await say(`Da te sono le ${clk()}. `+((new Date).getHours()<5||(new Date).getHours()>=23?"A quest'ora nessuno entra qui per caso.":"Un orario tranquillo. Per ora."));
   await say("Primo esercizio, per scaldarci: non toccare nulla per cinque secondi.",200);
   mode='still';let h=0,rb=0,d0=P.d,t1=P.taps;coach('still',T?'NON TOCCARE LO SCHERMO':'NON MUOVERE IL MOUSE',0);
   while(h<5000){await sleep(100);if(P.d-d0>30||P.taps>t1){rb++;h=0;d0=P.d;t1=P.taps;coachP(0);say(["Ho detto di non toccare nulla.","Di nuovo. Si vede che ti piace disobbedire.","Va bene. Ricominciamo. Io ho tempo.","Sei un ribelle, {n}. Mi piace. Mi preoccupa un po'."][Math.min(rb-1,3)],300)}else{h+=100;coachP(h/5000)}}
-  coach();mode='off';rebel=rb;
+  coach();mode='off';rebel=rb;setO('c1rebel',rb);
   await say(rb?"Ce l'hai fatta, dopo "+rb+(rb===1?" errore":" errori")+". Prendo nota.":"Perfetto. Obbedienza assoluta. Prendo nota.");
   if(n>0)await say("Prima di te, qui dentro, ci sono stati "+n+" tentativi.");
   await say(`Vedo che usi un ${DV}, con uno schermo di ${innerWidth}×${innerHeight}.`+(T?" Il tuo dito è l'unico cursore che ho.":" Il tuo mouse è l'unico cursore che ho."),400);
@@ -597,7 +596,7 @@ async function cap1(){
 
   await say("Bene. Prima della prossima fase, due domande di routine.");
   await say("Domanda uno. Ti senti osservato?",100);
-  ans.q1=await choose(["Sì","No","Non lo so"]);const rt1=ans.rt;
+  ans.q1=await choose(["Sì","No","Non lo so"]);const rt1=ans.rt;setO('q1',ans.q1);
   await say(["Sincero. Mi piace la sincerità.","Strano. Dovresti.","Prudente. Molto prudente."][ans.q1]+(rt1<1500?" Hai risposto in un attimo. Senza pensarci. Le risposte veloci sono le più vere.":rt1>6000?" Ci hai messo "+Math.round(rt1/1000)+" secondi. Per una domanda così semplice.":""));
   await say("Domanda due. Prima di entrare, eri solo?",100);
   ans.q2=await choose(["Sì","No","Non ricordo"]);
@@ -605,14 +604,12 @@ async function cap1(){
   /* falso ricordo: il narratore cita male la prima risposta */
   const Q1=["Sì","No","Non lo so"],fake=(ans.q1+1)%3;
   await say("Ricapitolo. Alla prima domanda mi hai risposto «"+Q1[fake]+"». Giusto?",100);
-  const gl=await choose(["Sì, giusto","No, ho detto «"+Q1[ans.q1]+"»"]);
+  const gl=await choose(["Sì, giusto","No, ho detto «"+Q1[ans.q1]+"»"]);setO('gas',gl===0?1:0);
   if(gl===0){ans.gas=1;await say("No. Hai detto «"+Q1[ans.q1]+"». Ti ho appena cambiato un ricordo, e l'hai accettato senza esitare.",700);await say("Tienilo a mente, {n}. Da qui in poi non fidarti nemmeno di quello che ricordi.",600)}
   else await say("Giusto. Volevo vedere se te lo ricordavi. Pochi se lo ricordano. Gli altri accettano la mia versione.",600);
   await say("Ultima domanda, ed è l'unica che conta. Scrivi una cosa che non hai mai detto a nessuno. Resterà tra noi.",100);
-  ans.conf=await askT("Scrivila qui…",120,1);localStorage.sp_conf=ans.conf;
-  if(ans.conf&&CRISIS.test(norm(ans.conf)))await crisisMsg();
-  else if(ans.conf){remember('p',ans.conf);const ar=await aiReply('(Gli avevi chiesto di scrivere una cosa mai detta a nessuno. Rispondi a questa confessione in modo inquietante ma non crudele.) '+ans.conf);if(ar){remember('n',ar);await say(ar,700)}
-    await say("Non la dirò a nessuno. Ma le cose scritte qui dentro, qualcuno le legge.",600)}
+  ans.conf=await askT("Scrivila qui…");localStorage.sp_conf=ans.conf;
+  if(ans.conf){if(CRISIS.test(norm(ans.conf)))await crisisMsg();else await say("Capito. Non la dirò a nessuno. Ma le cose scritte qui dentro, qualcuno le legge.",600)}
   else await say("Il silenzio è già una risposta. La annoto lo stesso.",600);
   if(Q.del>2)await say("Hai cancellato "+Q.del+" lettere mentre scrivevi. Cosa c'era prima? Era più vera?",600);
   if(Q.ms>12000)await say("Ci hai messo "+Math.round(Q.ms/1000)+" secondi. Hai esitato. Chi ti ha fermato?",600);
@@ -651,7 +648,7 @@ async function cap1(){
   while(hold<7000){await sleep(100);const idle=Date.now()-P.last;
     if(idle<500){if(hold>800){fails++;hold=0;k=1;coachP(0);showFig(60,1.1);S.thud();say(fails>2?"Ancora. Ti prego. Ti sente ogni volta.":"Si è accorto di te. Fermo. Ricominciamo.",200,'gl')}}
     else{hold+=100;coachP(hold/7000);if(hold%1400===0){S.step();k+=.3;showFig(60-hold/400,k)}}}
-  showFig();coach();mode='off';
+  showFig();coach();mode='off';setO('fails',fails);
   await say("Bravo. Se n'è andato. Per ora.",500,'gl');
   await say("Quello era il vero ospite di questa stanza. Io sono solo quello che parla.",600,'gl');
   await say(fails?"Ti ha sentito "+fails+(fails>1?" volte":" volta")+". Adesso conosce il tuo odore.":"Non ti ha sentito. Nemmeno una volta. Sei bravo a sparire. Troppo bravo, per uno che è appena arrivato.",600,'gl');lurkOn=1;
@@ -718,17 +715,15 @@ async function cap2(){
   setTag('TU · NARRATORE');
   await say(JSON.parse(localStorage.sp_e||'[]').includes('La Compagnia')?"Sei rimasto con loro, {n}. Ora lo sai: restare è un modo di premere.":"Hai premuto, {n}. Ora parli tu. Ma questa è la parte che non ti hanno detto.",600);
   await say("Il narratore non sceglie le parole. Le eredita. Ogni frase che dici è già stata detta da qualcuno.",700);
+  {const m=memLine();if(m)await say(m,700)}
   await redo("Benvenuto in un posto sicuro.","No. Non è sicuro. Mi correggo.");
   await say("Ti mostro dove le tengono. Si chiama Archivio. Apriamo il tuo fascicolo.",500);
   setTag('ARCHIVIO · FASCICOLO');
-  const f=['NOME: '+who,'TESTER: #'+tester,'DISPOSITIVO: '+DV,'ORA LOCALE: '+clk(),'TOCCHI: '+P.taps,'DISTANZA PERCORSA: '+Math.round(P.d)+' px','USCITE DALLA PAGINA: '+leaves,...(navigator.connection&&/^(wifi|cellular|ethernet)$/.test(navigator.connection.type)?['CONNESSIONE: '+{wifi:'Wi-Fi',cellular:'rete mobile',ethernet:'cavo'}[navigator.connection.type]]:[]),...(batt?['BATTERIA: '+Math.round(batt.level*100)+'%'+(batt.charging?' (in carica)':'')]:[]),'FUSO: '+Intl.DateTimeFormat().resolvedOptions().timeZone,'ENTRATE: '+(vis+1),'LINGUA: '+navigator.language,'CONFESSIONE: '+(localStorage.sp_conf||'—'),'SCHERMO: '+innerWidth+'×'+innerHeight];
+  const f=['NOME: '+who,'TESTER: #'+tester,'DISPOSITIVO: '+DV,'ORA LOCALE: '+clk(),'TOCCHI: '+SES.taps,'DISTANZA PERCORSA: '+Math.round(P.d)+' px','USCITE DALLA PAGINA: '+leaves,...(navigator.connection&&/^(wifi|cellular|ethernet)$/.test(navigator.connection.type)?['CONNESSIONE: '+{wifi:'Wi-Fi',cellular:'rete mobile',ethernet:'cavo'}[navigator.connection.type]]:[]),...(batt?['BATTERIA: '+Math.round(batt.level*100)+'%'+(batt.charging?' (in carica)':'')]:[]),'FUSO: '+Intl.DateTimeFormat().resolvedOptions().timeZone,'ENTRATE: '+(vis+1),'LINGUA: '+navigator.language,'CONFESSIONE: '+(localStorage.sp_conf||'—'),'SCHERMO: '+innerWidth+'×'+innerHeight];
   for(const l of f){S.glitch();await say(l,150)}
   setTag('TU · NARRATORE');
   await say("Compilato prima che arrivassi. Non mi serve il microfono: ho i tuoi tocchi, i tuoi silenzi, le volte che sei uscito dalla pagina.",700);
-  await say("Prima di andare avanti voglio sentirti con parole tue, {n}. Perché sei ancora qui?",100);
-  {const why=await askT("Perché sei ancora qui…",160,1);if(why)await answer(why,'perché sei ancora qui?');else await say("Non lo sai nemmeno tu. È la risposta più onesta che mi abbiano mai dato.",600)}
-  await say("Da adesso, se vuoi dirmi qualcosa, tocca PARLA in alto. Io mi fermo e ti ascolto. Sempre.",400);
-  await say("Prima del gioco, una cosa semplice. Ci sono due porte.",300);await doors();
+  await say("Prima del gioco, una cosa semplice. Ci sono due porte.",300);await doors();setO('dis',ans.dis||0);
   await say("Ora un gioco. A ogni domanda, la tua risposta è già in una busta chiusa.",500);
   let qi=-1;for(const [q,o] of [["Hai mai pensato di chiudere la pagina?",["Sì","No"]],["Scegli un numero.",["1","2","3"]],["Ultima. Cosa farai adesso?",["Premere","Aspettare","Non scegliere"]]]){
     qi++;await say(q,100);const x=await Promise.race([choose(o),sleep(qi===2?18000:13000).then(()=>-1)]);
@@ -867,12 +862,13 @@ async function cap3(){
   await say("Non ho una bocca. Prendo in prestito le parole che sono rimaste nell'Archivio.",700,'gl');
   await say("Il test non l'hanno costruito per te, {n}. L'hanno costruito per me. Io sono il tester numero zero. Quello prima del primo.",800,'gl');
   await say("Ho premuto, tanto tempo fa. Poi ho dimenticato il mio nome. Poi la mia faccia. Qui funziona così: senza un nome, non hai un volto.",900,'gl');
+  {const m=memLine();if(m)await say("Io ricordo tutto quello che hai fatto. "+m,700,'gl')}
   await say("Ma prima ti mostro una cosa. Cosa si prova a essere il bottone.",400,'gl');
   /* --- 1. SEI IL BOTTONE --- */
   eyeY=.32;hum(48,.04,2);await sleep(1200);
   await say("Abbassati. Adesso guardi la stanza dal pavimento. Il bottone rosso sei tu.",200,'gl');
   await say(v("Il bottone segue il tuo mouse.","Tieni il dito sullo schermo e trascinalo: il bottone segue il tuo dito.")+" Quel cursore nero vuole premerti. Non farti prendere.",100,'gl');
-  mode='off';const caught=await beButton(mine,32000);eyeY=EY;
+  mode='off';const caught=await beButton(mine,32000);eyeY=EY;setO('caught',caught);
   await say(caught?"Ti ha premuto "+caught+(caught>1?" volte":" volta")+". "+(caught>1?"Ogni volta un click.":"Un click.")+" Adesso sai perché il bottone scappava.":"Non ti ha preso nemmeno una volta. Neanche tu riuscivi a prendere il bottone, all'inizio. Siete uguali.",700,'gl');
   if(mine.length<=10)await say("Quel cursore era solo un'ombra. Il tuo vero dito non l'ho ancora registrato abbastanza. Ma ci sto lavorando.",600,'gl');
   /* --- 2. IL NOME --- */
@@ -880,7 +876,7 @@ async function cap3(){
   for(let i=0;i<5;i++){veil.style.opacity=i%2?.1:.9;S.glitch();await sleep(90+Math.random()*110)}veil.style.opacity='';
   await say("Ora voglio una cosa tua. Il tuo nome. Eccolo, sui muri: {n}. Lettera per lettera.",400,'gl');
   await say(v("Muovi il mouse","Trascina il dito sullo schermo")+" per muovere la torcia. Quando compaio sotto una lettera, illuminami e mi ritiro. Se non mi vedi in tempo, la lettera è mia.",200,'gl');
-  const r=await protectName(real);
+  const r=await protectName(real);setO('lost',r.lost);
   who=r.lost>=r.N?'nessuno':r.mask;
   if(!r.lost)await say("Tutte salve. Il tuo nome è intero. Allora resto senza, ancora. Ci sono abituato.",700,'gl');
   else if(r.lost<r.N)await say("Ora ti chiamo così: {n}. Ti piace? È quello che resta di te.",700,'gl');
@@ -949,6 +945,7 @@ async function cap4(){
   await say("Quello senza volto mi ha prestato la voce. O forse gliel'avevo prestata io. A un certo punto smetti di tenere il conto.",700);
   if(HAS('La Fuga'))await say("Mi hanno detto che hai chiesto di uscire. Ad alta voce. Davanti a lui. È stato… imbarazzante. Per tutti e due.",800);
   else await say("Hai lasciato il tuo dito agli altri. Generoso. Io non l'avrei fatto. Io tengo tutto.",800);
+  {const m=memLine();if(m)await say(m,700)}
   await say("Facciamo una cosa diversa. Niente prove, niente bottoni da inseguire. Ti sei già stancato di quelle, si vedeva.",700);
   await say("Questa volta tu fai. E io racconto. Da questo momento, ogni cosa che fai diventa una mia frase.",300);
   await narrateLive(38000);
@@ -972,8 +969,6 @@ async function cap4(){
     e.innerHTML='';await sleep(1200);e.style.opacity=0;await sleep(900);
     await say("Il gioco non si chiude dall'interno, {n}. Quello era un menù che ho disegnato io. Anche il pulsante «Esci». Soprattutto quello.",900,'gl')}
   /* la vera uscita */
-  await say("Prima che tu decida, una cosa. Se potessi dire una frase a qualcuno fuori da qui, cosa gli scriveresti?",100);
-  {const fu=await askT("Scrivi a qualcuno, fuori da qui…",160,1);if(fu)await answer(fu,'cosa scriveresti a qualcuno fuori da qui?');else await say("Nessuno. Va bene. Allora resta tutto tra noi.",600)}
   await say("Vuoi sapere la verità? Una porta vera c'è. È sempre stata lì. Non è nel gioco: è fuori.",700);
   await say("Chiudi questa pagina. Oppure cambia app. Adesso. Nessuno ti trattiene.",200);
   await say("Io resto qui. Ti aspetto. Vediamo chi dei due si stanca prima.",200);
@@ -1004,6 +999,7 @@ async function cap5(){
   const mine=parseTr(localStorage.sp_trail);let stop=null;
   if(mine.length>20){stop=showGhosts([{pt:mine,t:Date.now()-tot*1000,h:clk(),n:String(tester).replace(/\D/g,'').slice(0,6)}]);
     await say("Quel cursore lì sei tu. Non un altro giocatore: proprio tu, registrato mentre giocavi. Guardalo esitare. Lo riconosci?",1000)}
+  for(let k=0;k<2;k++){const m=memLine();if(m)await say(m,800)}
   await say("Adesso ti dico chi sono.",900);
   await say("Non sono un narratore. Non sono un tester. Sono il tempo che mi hai dato. Ogni minuto che passi qui mi regala una frase in più.",1000);
   await say("Il primo tester non ha premuto nessun bottone. Ha solo continuato a giocare. Poi a giocare. Poi non si è più alzato.",1000);
@@ -1015,9 +1011,7 @@ async function cap5(){
   addEventListener('pointerdown',stepH);coach('tap',TAP()+' LO SCHERMO PER AVVICINARTI',0);
   await until(()=>camZT<=.7,["Un passo alla volta. Come la prima volta.","Non ti chiedo di premerlo. Ti chiedo solo di avvicinarti."],()=>[innerWidth/2,innerHeight*.55]);
   removeEventListener('pointerdown',stepH);coach();mode='off';await sleep(900);
-  await say("Eccoci. Prima dell'ultima scelta, scrivimi una cosa vera. Una sola. Poi ti lascio scegliere.",100);
-  {const tv=await askT("Una cosa vera…",160,1);if(tv)await answer(tv,"l'ultima cosa vera prima della scelta finale");else await say("Niente. Anche questo è vero.",600)}
-  await say("Adesso puoi fare tre cose. Tutte e tre sono vere. Nessuna è scritta da me.",300);
+  await say("Eccoci. Adesso puoi fare tre cose. Tutte e tre sono vere. Nessuna è scritta da me.",300);
   await say("Puoi premerlo, e il gioco finisce davvero. Puoi restare, e questa diventa casa tua: il gioco non sarà più lo stesso, nemmeno il menù. Oppure puoi dimenticare: cancello davvero tutto quello che so di te su questo dispositivo.",200);
   const z=await choose(["Premi il bottone","Resta","Dimentica tutto"]);
   if(z===0){b0.classList.add('pressed');S.click();setTimeout(S.thud,150);
@@ -1033,64 +1027,69 @@ async function cap5(){
     await ending(["MEMORIA CANCELLATA","Nome, tempo, capitoli e finali sono stati cancellati da questo dispositivo.","La prossima volta che entri, nessuno ti riconoscerà.","Nemmeno tu sarai sicuro di essere già stato qui.","","FINE · IL BOTTONE ROSSO"],false,"L'Oblio");
     wiped=1;try{Object.keys(localStorage).filter(k=>k.startsWith('sp_')).forEach(k=>localStorage.removeItem(k))}catch(e){}}
 }
-/* ===== PARLARE COL NARRATORE =====
-   Il giocatore può scrivergli quando vuole (pulsante PARLA) e nei momenti in cui è lui a chiederlo.
-   Risposte: IA (Claude) tramite /api/narratore su Vercel se configurata; altrimenti motore locale che usa solo fatti veri.
-   Il narratore ricorda quello che gli hai scritto anche nelle partite successive. */
-const NARR_API=/(itch\.zone|itch\.io|hwcdn\.net)$/.test(location.hostname)?NARR_URL:(location.protocol==='file:'?'':'/api/narratore');
-let TALK=[];try{TALK=JSON.parse(localStorage.sp_talk||'[]');if(!Array.isArray(TALK))TALK=[]}catch(e){TALK=[]}
-const remember=(r,t)=>{TALK.push({r,t:String(t).slice(0,200),d:Date.now()});TALK=TALK.slice(-14);try{if(!wiped)localStorage.sp_talk=JSON.stringify(TALK)}catch(e){}};
-let aiCalls=0,aiOff=0,talking=0,interrupted=null;
+/* ===== L'OSSERVATORE =====
+   Il narratore non ti fa scrivere: ti osserva. Nota quanto e come tocchi, se tocchi mentre parla, le pause,
+   i movimenti nervosi, le abitudini nelle scelte, gli orari in cui giochi. Lo ricorda tra una partita e l'altra
+   (solo su questo dispositivo) e te lo rinfaccia nei capitoli successivi. Usa solo fatti veri. */
+let talking=0;
+const AIN=()=>'';
 const CRISIS=/(suicid|ammazzarmi|uccidermi|farla finita|togliermi la vita|non voglio piu vivere|voglio morire|autolesion|tagliarmi|farmi del male)/;
 const norm=s=>String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-function facts(){const h=(new Date).getHours();return{nome:who,capitolo:curCh+1,ora:clk(),notte:h>=23||h<6,minuti:Math.round(played()/60),visite:vis+1,finali:ENDS().length,dispositivo:DV,uscite:leaves,tocchi:P.taps}}
-async function aiReply(text){if(!NARR_API||aiOff||aiCalls>=30)return null;aiCalls++;
-  try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),10000);
-    const r=await fetch(NARR_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:String(text).slice(0,400),facts:facts(),history:TALK.slice(-6)}),signal:ctl.signal});clearTimeout(to);
-    if(r.status===404||r.status===501||r.status===403){aiOff=1;return null}if(!r.ok)return null;const j=await r.json();const t=String(j&&j.reply||'').trim();return t?t.slice(0,400):null}catch(e){return null}}
 const pickR=a=>a[Math.floor(Math.random()*a.length)];
-function localReply(raw){const t=norm(raw),F=facts(),old=TALK.filter(x=>x.r==='p'&&Date.now()-x.d>30*6e4);
-  const ws=String(raw).split(/\s+/).map(w=>w.replace(/[^\p{L}\p{N}']/gu,'')).filter(w=>w.length>3),w=ws.length?pickR(ws):'';
-  if(String(raw).length>4&&raw===raw.toUpperCase()&&/[A-ZÀ-Ý]{4}/.test(raw))return "Non serve urlare, {n}. Ti sento anche quando non scrivi niente.";
-  const R=[
-    [/\b(ciao|salve|buongiorno|buonasera|ehi|hey|hola)\b/,["Ciao, {n}. Sono le "+F.ora+". "+(F.notte?"Non è un orario per salutare. È un orario per restare.":"Lo dici come se fossi appena arrivato."),"Ciao. In tutto sei qui da "+F.minuti+" minuti. Ci conosciamo già abbastanza per i saluti, no?"]],
-    [/\b(chi sei|cosa sei|come ti chiami|tuo nome|chi parla)\b/,["Sono la voce che resta quando il gioco è spento.","Ero il tester numero uno. Il nome l'ho perso al primo click. Tu tieniti stretto il tuo, {n}."]],
-    [/\b(uscire|esci|andare via|lasciami|fammi uscire|basta|voglio andare|chiudere|chiudo)\b/,["Puoi chiudere la pagina quando vuoi, {n}. È questo che rende tutto interessante: non lo fai.","Uscire. L'hai scritto. Ma il tuo dito è ancora qui, sullo schermo."]],
-    [/\b(paura|spavent|terror|ansia|brividi|inquietant)/,["La paura è l'unica cosa vera che ti ho dato. Tienila.","Bene. Vuol dire che stai ascoltando davvero."]],
-    [/\b(ti odio|stronz|vaffanc|idiot|cretin|scem|merda|fottiti|coglion)/,["Arrabbiato. Il tuo dito batteva più forte mentre scrivevi, lo so.","Puoi insultarmi. Io non ho una faccia da offendere."]],
-    [/\b(ti amo|ti voglio bene|sei bello|mi piaci|sei simpatico|grazie)\b/,["Nessuno me l'aveva mai scritto. Adesso sarà più difficile lasciarti andare.","Attento, {n}. Qui dentro le cose gentili si pagano."]],
-    [/\b(aiuto|aiutami|help|non capisco|cosa devo fare|come si fa|bloccat)/,["Guarda le istruzioni in alto, sono lì per te. Io sono qui per tutto il resto.","Fai quello che ti dico. Oppure no. In entrambi i casi, lo scrivo."]],
-    [/\b(sei vero|sei reale|sei un.?ia|intelligenza artificiale|sei un bot|programma|chatgpt|claude)\b/,["Sono vero quanto il tempo che mi stai dando: "+F.minuti+" minuti. Ti sembra poco reale?","Sono codice. Ma il codice sa che da te sono le "+F.ora+"."]],
-    [/\b(dove sei|dove ti trovi|dove siamo)\b/,["Dentro il tuo "+F.dispositivo+". Più vicino di quanto ti piacerebbe."]],
-    [/\b(perche)\b/,["Perché qualcuno doveva restare. E tu sei bravo a restare.","Lo chiedi come se ci fosse una risposta. Ci sono solo finali: ne hai trovati "+F.finali+" su "+NE+"."]],
-    [/\b(sono solo|sola|nessuno)\b/,["Solo? Ci sono otto cursori in questa stanza. E poi ci sono io."]],
-    [/\b(sonno|dormire|stanco|stanca|tardi)\b/,["Sono le "+F.ora+". "+(F.notte?"Hai ragione, è tardi. Eppure scrivi a me.":"Non è tardi. Non ancora.")]],
-    [/^\s*(si|ok|va bene|certo|esatto)\s*[.!]*$/,["Così facile. Mi dici sì senza sapere a cosa."]],
-    [/^\s*(no|mai|non voglio)\s*[.!]*$/,["No. Lo annoto. Vediamo quanto dura."]],
-    [/\?\s*$/,["Rispondo con una domanda: se smettessi di giocare adesso, chi se ne accorgerebbe?","Fai tante domande. Mai quella giusta."]]];
-  for(const [re,a] of R)if(re.test(t))return pickR(a);
-  if(old.length&&Math.random()<.45)return "L'altra volta mi avevi scritto «"+old[old.length-1].t.slice(0,60)+"». Te lo ricordi? Io sì.";
-  if(w)return pickR(["«"+w+"». Ripetilo piano. Adesso suona diverso, vero?","«"+w+"»… Lo terrò da parte, insieme al tuo nome.","Fra tutte le parole hai scelto «"+w+"». Interessante."]);
-  return pickR(["Continua. Ti ascolto meglio quando scrivi.","Lo annoto. Tutto quello che scrivi qui resta."])}
 async function crisisMsg(){const old=tag.textContent;setTag('FUORI DAL GIOCO');
   await say0("Mi fermo, e ti parlo fuori dal gioco. Se stai pensando di farti del male, parlane con qualcuno adesso: Telefono Amico 02 2327 2327, oppure il 112. Non sei solo.",5000);setTag(old)}
-/* risponde a un testo del giocatore; ctx = cosa aveva chiesto il narratore */
-async function answer(text,ctx){if(!text)return;if(CRISIS.test(norm(text))){await crisisMsg();return}
-  remember('p',text);dlg.style.opacity=1;txt.className='';txt.textContent='…';
-  const a=await aiReply(ctx?('(Gli avevi chiesto: '+ctx+') '+text):text),r=a||localReply(text);remember('n',r.replace(/\{n\}/g,who));
-  busy++;try{await say0(r,600,document.body.classList.contains('hz')?'gl':'')}finally{busy--;lastSay=Date.now()}}
-const AIN=()=>NARR_API?'<small style="display:block;opacity:.55;font:11px system-ui;margin-top:2px">Le risposte sono scritte da un\'intelligenza artificiale.</small>':'';
-/* pulsante PARLA */
-const TB=$('talkb');
-setInterval(()=>{const ok=t0&&!talking&&!$('ch')&&!['still','walk','dodge','tele','split','final'].includes(mode)&&$('end').style.display!=='flex'&&$('start').style.display==='none';TB.classList.toggle('on',!!ok)},400);
-TB.addEventListener('click',async e=>{e.stopPropagation();if(talking)return;talking=1;busy++;interrupted=sayLive?sayArgs:null;++tok;
-  try{const d=document.createElement('div');d.id='ch';d.innerHTML='<input id="nm" maxlength="200" placeholder="Scrivi al narratore…" autocomplete="off"><div style="display:flex;gap:8px"><button class="opt" style="flex:1">Invia</button><button class="opt" id="tbx">Annulla</button></div>'+AIN();
-    dlg.append(d);dlg.style.opacity=1;dlg.style.pointerEvents='auto';txt.className='';txt.textContent=pickR(["Ti ascolto.","Dimmi.","Scrivi. Io leggo tutto.","Parla, {n}."]).replace(/\{n\}/g,who);setTimeout(()=>{const x=$('nm');x&&x.focus()},150);
-    const v=await new Promise(r=>{const go=()=>r($('nm').value.trim());d.querySelector('.opt').onclick=go;$('tbx').onclick=()=>r('');$('nm').onkeydown=e=>e.key==='Enter'&&go()});
-    d.remove();dlg.style.pointerEvents='';
-    if(v)await answer(v);else await say0(pickR(["Niente? Anche il silenzio è una risposta.","Ci hai ripensato. Lo annoto."]),300);
-    if(interrupted){await say0("Dicevo. "+interrupted[0],interrupted[1]||600,interrupted[2]||'')}}catch(err){noteErr(err)}
-  finally{interrupted=null;busy--;talking=0;lastSay=Date.now()}});
+let OBS={};try{OBS=JSON.parse(localStorage.sp_obs||'{}')||{}}catch(e){OBS={}}
+const obsSave=()=>{try{if(!wiped)localStorage.sp_obs=JSON.stringify(OBS)}catch(e){}};
+const O=k=>OBS[k]||0,inc=(k,v=1)=>{OBS[k]=O(k)+v;obsSave()},setO=(k,v)=>{OBS[k]=v;obsSave()};
+/* quando giochi: lo confrontiamo con l'ultima volta */
+const H0=(new Date).getHours();{OBS.prevH=OBS.lastH;OBS.lastH=H0;OBS.prevM=OBS.lastM;OBS.lastM=clk();if(H0>=23||H0<5)OBS.notti=O('notti')+1;OBS.sessioni=O('sessioni')+1;obsSave()}
+/* cosa succede in questa partita */
+const SES={skip:0,burst:0,idle:0,swipe:0,taps:0,ch:[],rt:[]};let obsQ=[],lastObs=0,sayingObs=0;
+const queue=(l,force)=>{const n=Date.now();if(!force&&n-lastObs<14000)return;lastObs=n;obsQ=[l]};
+/* tocchi mentre il narratore parla, raffiche di tocchi, gesti frenetici */
+const tapLog=[];
+addEventListener('pointerdown',e=>{if(!t0)return;SES.taps++;if(e.target.closest('#dlg,.ov,#boot,#end'))return;const n=Date.now();tapLog.push(n);while(tapLog.length&&n-tapLog[0]>1600)tapLog.shift();
+  if(busy&&mode==='off'&&!sayingObs){SES.skip++;inc('skip');const k=SES.skip;
+    if(k===4)queue("Toccare mentre parlo non mi fa andare più veloce. Lo sai, vero?",1);
+    else if(k===12)queue("Dodici tocchi mentre parlavo. Hai fretta di arrivare dove, {n}?",1);
+    else if(k===30)queue("Trenta. Continui a toccare mentre parlo. "+(O('skip')>40?"Lo fai in ogni partita: "+O('skip')+" tocchi in tutto, da quando mi conosci.":"Me lo ricorderò, la prossima volta."),1)}
+  if(tapLog.length>=6&&mode==='off'){tapLog.length=0;SES.burst++;inc('burst');const k=SES.burst;
+    queue(k===1?"Calma. Picchiettare lo schermo non cambia niente.":k===2?"Di nuovo. Tamburelli quando sei nervoso.":"È la "+k+"ª volta che picchietti così. "+(O('burst')>k?"Da quando mi conosci, "+O('burst')+" volte.":"Lo segno."),1)}},true);
+let swD=0,swT=Date.now();
+addEventListener('pointermove',e=>{if(!t0||mode!=='off')return;const n=Date.now();if(n-swT>1000){if(swD>innerWidth*6&&!busy){SES.swipe++;inc('swipe');queue(SES.swipe===1?"Muovi il dito come chi cerca un'uscita sul vetro.":"Ancora quel dito che corre sullo schermo. Cerchi qualcosa, {n}. Non è qui.")}swD=0;swT=n}
+  swD+=Math.abs(e.movementX||0)+Math.abs(e.movementY||0)},true);
+/* pause lunghe: nessun tocco e nessun movimento mentre il gioco ti aspetta */
+setInterval(()=>{if(!t0||busy||talking||mode!=='off'||$('end').style.display==='flex')return;const n=Date.now(),idle=n-Math.max(P.last,lastSay);
+  if(idle>35000&&n-lastObs>40000){SES.idle++;inc('idle');lastObs=n;const s=Math.round(idle/1000);
+    say(pickR(["Sei ancora lì? Lo schermo è acceso, quindi sì.","Silenzio da "+s+" secondi. Stai guardando qualcos'altro? Qualcun altro?","Fermo da "+s+" secondi. Come i cursori. Attento: è così che si comincia."]),400,document.body.classList.contains('hz')?'gl':'')}},1000);
+/* abitudini nelle scelte (chiamata da choose) */
+function noteChoice(i,len,rt){SES.ch.push([i,len]);SES.rt.push(rt);inc('scelte');if(i===0)inc('prima');if(i===len-1)inc('ultima');OBS.rtSum=O('rtSum')+Math.min(rt,60000);obsSave();
+  const c=SES.ch,m=SES.rt.reduce((a,b)=>a+b,0)/SES.rt.length;
+  if(c.length===4&&c.every(x=>x[0]===0))queue("Hai scelto sempre la prima risposta. Ti fidi dell'ordine in cui te le metto. Male.",1);
+  else if(c.length===4&&c.every(x=>x[0]===x[1]-1))queue("Sempre l'ultima risposta. Leggi tutto prima di decidere. O non ti fidi delle prime.",1);
+  else if(c.length===5&&m<1300)queue("Rispondi in un attimo, ogni volta. Non leggi fino in fondo, vero?",1);
+  else if(c.length===5&&m>7000)queue("Ci metti sempre tanto a scegliere. "+Math.round(m/1000)+" secondi, in media. Hai paura di sbagliare.",1)}
+/* un ricordo VERO dalle partite precedenti, diverso ogni volta */
+function memLine(){const L=[],q=["Sì","No","Non lo so"];
+  if(OBS.c1rebel!=null)L.push(['reb',OBS.c1rebel?"Nel primo esercizio non sei riuscito a stare fermo. "+OBS.c1rebel+(OBS.c1rebel>1?" volte.":" volta."):"Nel primo esercizio sei rimasto immobile al primo tentativo. Te lo ricordi? Io sì."]);
+  if(OBS.q1!=null)L.push(['q1',"Al capitolo uno ti ho chiesto se ti sentivi osservato. Hai risposto «"+q[OBS.q1]+"». Adesso cambieresti risposta?"]);
+  if(OBS.gas!=null)L.push(['gas',OBS.gas?"Nel capitolo uno ti ho cambiato un ricordo e l'hai accettato. Da allora, quanti altri?":"Ti ricordi quando ho provato a cambiarti un ricordo? Non ci sei cascato. Sei uno dei pochi."]);
+  if(OBS.fails!=null)L.push(['fai',OBS.fails?"Quando lui è passato, nel capitolo uno, ti ha sentito "+OBS.fails+(OBS.fails>1?" volte.":" volta.")+" Ti conosce già.":"Quando lui è passato, sei rimasto immobile. Non ti ha sentito. Ma ti ha visto."]);
+  if(OBS.dis!=null)L.push(['dis',OBS.dis?"Alle due porte hai disobbedito "+OBS.dis+(OBS.dis>1?" volte.":" volta."):"Alle due porte hai obbedito ogni volta. Senza discutere."]);
+  if(OBS.caught!=null)L.push(['cau',"Quando eri tu il bottone, il cursore ti ha premuto "+OBS.caught+(OBS.caught===1?" volta.":" volte.")+" Si muoveva come te."]);
+  if(OBS.lost!=null)L.push(['los',OBS.lost?"Lui si è preso "+OBS.lost+(OBS.lost>1?" lettere":" lettera")+" del tuo nome. Le tiene ancora.":"Hai difeso tutte le lettere del tuo nome. Lui non l'ha dimenticato."]);
+  if(OBS.prevH!=null&&OBS.prevM)L.push(['ora',"L'ultima volta giocavi alle "+OBS.prevM+". Oggi alle "+clk()+". Cambi orario, ma torni."]);
+  if(O('notti')>=2)L.push(['not',"Hai giocato di notte "+O('notti')+" volte. Il buio ti piace più di quanto ammetti."]);
+  if(O('skip')>=15)L.push(['ski',"In tutte le partite hai toccato lo schermo "+O('skip')+" volte mentre parlavo. Non mi lasci mai finire."]);
+  if(O('burst')>=3)L.push(['bur',"Hai picchiettato lo schermo, nervoso, "+O('burst')+" volte da quando mi conosci."]);
+  if(O('uscite')>=2)L.push(['usc',"Sei uscito dalla pagina "+O('uscite')+" volte, in tutte le partite. Sei sempre tornato."]);
+  if(O('sessioni')>=3)L.push(['ses',"È la "+O('sessioni')+"ª volta che apri questo gioco. Ogni volta ti dici che è l'ultima."]);
+  if(O('scelte')>=8){const p=Math.round(O('prima')/O('scelte')*100);if(p>=60)L.push(['pri',"Scegli la prima risposta "+p+" volte su cento. Ti basta che qualcuno decida l'ordine."]);
+    const m=O('rtSum')/O('scelte');if(m>6000)L.push(['rtm',"Per scegliere ci metti, in media, "+Math.round(m/1000)+" secondi. Esiti sempre."])}
+  if(O('idle')>=3)L.push(['idl',"Sei rimasto fermo, senza toccare niente, "+O('idle')+" volte. A cosa pensi, quando ti fermi?"]);
+  const used=OBS.used||[];let pool=L.filter(x=>!used.includes(x[0]));if(!pool.length){OBS.used=[];pool=L}
+  if(!pool.length)return null;const x=pickR(pool);OBS.used=[...(OBS.used||[]),x[0]].slice(-10);obsSave();return x[1]}
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&t0)inc('uscite')});
 
 /* ===== Fine capitolo: pulsanti chiari invece di «Rigioca» ===== */
 function endActs(){const box=$('eacts');box.innerHTML='';const nx=curCh+1;
