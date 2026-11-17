@@ -56,7 +56,7 @@ Per farlo rispondere con un'intelligenza artificiale (Claude):
 2. Su **Vercel → il progetto → Settings → Environment Variables** aggiungi
    `ANTHROPIC_API_KEY` = la tua chiave (ambiente *Production*), poi rifai il deploy.
    La chiave resta sul server, nel file `api/narratore.js`: **non finisce mai nel gioco**.
-3. Per la versione **itch.io**, metti l'indirizzo completo nella costante `NARR_URL`
+3. Per la versione **itch.io** l'indirizzo è già impostato (`NARR_URL` = https://redbotton.vercel.app/api/narratore); se cambi sito, aggiorna la costante `NARR_URL`
    in `index.html`, ad esempio `https://il-tuo-sito.vercel.app/api/narratore`, e rifai lo zip.
    Se usi un dominio tuo (non `.vercel.app`), aggiungi su Vercel anche
    `SITE_HOST` = il tuo dominio (es. `gioco.miosito.it`).
