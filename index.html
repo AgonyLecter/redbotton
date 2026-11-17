@@ -14,8 +14,16 @@ html,body{margin:0;height:100%;overflow:hidden;background:#000;font-family:Georg
 body.hz #lamp{animation:lf 2.7s infinite;background:linear-gradient(rgba(255,230,200,.35),transparent)}
 @keyframes lf{0%,100%{opacity:1}45%{opacity:.3}50%{opacity:.9}55%{opacity:.1}}
 #dust{position:fixed;inset:0;pointer-events:none;z-index:8}
-#fig{position:fixed;left:70%;top:calc(58% - 28vh);width:7vh;height:28vh;background:#09090b;border-radius:40% 40% 8% 8%/22% 22% 4% 4%;opacity:0;z-index:9;transform-origin:50% 100%;transform:scale(var(--k,1));pointer-events:none}
-#fig:before{content:"";position:absolute;left:12%;right:12%;top:-9%;height:20%;border-radius:50%;background:#09090b}
+#fig{position:fixed;left:70%;top:calc(58% - 34vh + var(--dy,0vh));height:34vh;width:11.3vh;opacity:0;z-index:9;transform-origin:50% 100%;transform:scale(var(--k,1));pointer-events:none;filter:drop-shadow(0 0 8px rgba(150,150,210,.3));animation:sw 6s ease-in-out infinite}
+@keyframes sw{0%,100%{rotate:-.8deg}50%{rotate:1.2deg}}
+#fig .hd{transform-origin:40px 34px;animation:hd 3.5s steps(1) infinite}
+@keyframes hd{0%,40%{transform:rotate(-9deg)}42%,60%{transform:rotate(15deg)}62%,100%{transform:rotate(-9deg)}}
+#fig .ey{fill:#e8fff4;opacity:0;transition:opacity .4s}
+#fig.near .ey{opacity:1;filter:drop-shadow(0 0 3px #aff)}
+#door{position:absolute;left:22%;top:calc(58% - 26vh);width:11.3vh;height:26vh;background:linear-gradient(90deg,#e6e6ec,#f2f2f6);border:4px solid #c4c4cd;border-bottom:0;box-shadow:inset 0 0 12px rgba(0,0,0,.15);transition:background 1.5s,box-shadow 1.5s}
+#door i{position:absolute;right:12%;top:52%;width:7px;height:7px;border-radius:50%;background:#aaa}
+#door.open{background:#030304;box-shadow:inset 0 0 30px #000,0 0 18px rgba(0,0,0,.5)}
+#card{position:fixed;inset:0;background:#000;color:#eee;display:flex;align-items:center;justify-content:center;text-align:center;font:1.1rem/1.9 Georgia,serif;letter-spacing:.3em;opacity:0;pointer-events:none;transition:opacity 1.4s;z-index:35;padding:30px}
 .btn{position:absolute;width:104px;height:90px;transform:translate(-50%,-85%) scale(var(--s,1));transform-origin:50% 90%;cursor:pointer;transition:left .3s cubic-bezier(.3,1.4,.5,1),top .3s cubic-bezier(.3,1.4,.5,1);animation:in .5s}
 @keyframes in{from{opacity:0}}
 .btn i{position:absolute;display:block}
@@ -48,25 +56,33 @@ body.hz #tag:before{background:#e33}
 .opt,#nm{font:inherit;font-size:1rem;padding:11px 14px;border-radius:9px;border:1px solid #556;background:#23232e;color:#eee;cursor:pointer;text-align:left}
 #nm{-webkit-user-select:text;user-select:text;cursor:text}
 .ov{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;z-index:30}
-#start{background:#f7f7fa;color:#222}
-#start h1{font-weight:400;letter-spacing:.2em;margin:0;font-size:clamp(1.4rem,6vw,2.2rem)}
-#start p{margin:0;color:#777;max-width:380px;font-size:.95rem}
+#start{align-items:flex-start;justify-content:center;text-align:left;padding:0 8vw;gap:34px;background:linear-gradient(90deg,rgba(247,247,250,.97) 30%,rgba(247,247,250,.3))}
+#mt small{font:11px ui-monospace,monospace;letter-spacing:.3em;color:#c22}
+#mt h1{font-weight:400;letter-spacing:.14em;margin:10px 0 0;font-size:clamp(2.4rem,11vw,4.6rem);line-height:1;border-bottom:2px solid #c22;padding-bottom:18px}
+#mn a{display:block;font-size:1.35rem;padding:8px 0;cursor:pointer;color:#222;transition:padding .2s,color .2s}
+#mn a:hover,#mn a:active{color:#c00;padding-left:12px}
+#mn a.lk{color:#aaa;cursor:default;padding-left:0}
+#mq{position:absolute;left:8vw;right:8vw;bottom:calc(5vh + env(safe-area-inset-bottom));font:italic 1rem Georgia,serif;color:#666;transition:opacity .5s}
 .big{font:inherit;font-size:1.05rem;padding:12px 28px;border:2px solid currentColor;background:none;color:inherit;border-radius:8px;cursor:pointer}
 #end{display:none;background:#000;color:#9fd;font:14px/1.9 ui-monospace,monospace;z-index:40}
 #ebtn{opacity:0;transition:opacity 1s;color:inherit;font-family:inherit}
 </style>
 </head>
 <body>
-<div id="room"><div id="lamp"></div></div>
+<div id="room"><div id="lamp"></div><div id="door"><i></i></div></div>
 <canvas id="dust"></canvas>
-<div id="fig"></div>
+<svg id="fig" viewBox="0 0 80 240"><defs><linearGradient id="fg" x1="0" x2="1"><stop offset="0" stop-color="#040405"/><stop offset=".5" stop-color="#101016"/><stop offset="1" stop-color="#040405"/></linearGradient></defs>
+<g fill="url(#fg)" stroke="#33333f" stroke-width=".7"><rect x="37" y="30" width="6" height="12"/><path d="M26 40Q40 35 54 40L52 114H28Z"/>
+<path d="M26 40Q15 82 17 152L22 152Q24 92 30 48Z"/><path d="M54 40Q65 82 63 152L58 152Q56 92 50 48Z"/>
+<path d="M29 112H36L35 238H29Z"/><path d="M44 112H51L51 238H45Z"/>
+<g class="hd"><ellipse cx="40" cy="21" rx="9.5" ry="13"/><circle class="ey" cx="36" cy="21" r="1.5"/><circle class="ey" cx="44" cy="21" r="1.5"/></g></g>
+<path d="M16 152l-1 15M19 152v17M22 152l1 15M58 152l-1 15M61 152v17M64 152l1 15" stroke="#33333f" stroke-width="1.2" fill="none"/></svg>
 <div id="veil"></div>
-<div id="hud"></div>
+<div id="hud"></div><div id="card"></div>
 <div id="dlg"><div id="tag">NARRATORE</div><div id="txt"></div></div>
 <div class="ov" id="start">
-  <h1>TEST DI ACCETTAZIONE</h1>
-  <p>Stanza 1. Un solo compito: premere il bottone rosso. Il narratore parla solo a testo, quindi leggi con attenzione. Meglio con l'audio acceso.</p>
-  <button class="big" id="go">Inizia il test</button>
+  <div id="mt"><small>UN TEST DI OBBEDIENZA</small><h1>IL BOTTONE<br>ROSSO</h1></div>
+  <div id="mn"></div><div id="mq"></div>
 </div>
 <div class="ov" id="end"><div id="elog"></div><button class="big" id="ebtn" onclick="location.reload()">Rigioca</button></div>
 
@@ -79,7 +95,7 @@ const $=i=>document.getElementById(i),room=$('room'),txt=$('txt'),dlg=$('dlg'),t
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),rnd=(a,b)=>a+Math.random()*(b-a);
 const T=matchMedia('(pointer:coarse)').matches,v=(m,t)=>T?t:m;
 const uid=localStorage.sp_uid||(localStorage.sp_uid=Math.random().toString(36).slice(2,10));
-let db=null,fb={},mode='off',bts=[],c={dodge:0,tele:0,split:0,all:0},tok=0,lastR=0,hint='',tester='0000',t0=0,pressed=false,who='Tester',ans={},tg=null,ghN=0;
+let muted=false,rebel=0,db=null,fb={},mode='off',bts=[],c={dodge:0,tele:0,split:0,all:0},tok=0,lastR=0,hint='',tester='0000',t0=0,pressed=false,who='Tester',ans={},tg=null,ghN=0;
 const P={d:0,taps:0,mx:innerWidth/2,my:innerHeight/2,last:Date.now(),empty:0,clicks:[],blurAt:0},buf=[];
 const setTag=s=>tag.textContent=s;
 
@@ -93,7 +109,7 @@ const attempt=()=>{if(db){fb.runTransaction(fb.ref(db,'stanza/globale/tentativi'
 
 /* ===== Audio (sintetizzato) ===== */
 let ac,mg,hO,hG,hb=0;
-const AC=()=>{if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();mg=ac.createGain();mg.connect(ac.destination)}return ac};
+const AC=()=>{if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();mg=ac.createGain();mg.gain.value=muted?0:1;mg.connect(ac.destination)}return ac};
 function tone(f,d=.1,type='sine',vol=.06,sl=0){try{const a=AC(),o=a.createOscillator(),g=a.createGain(),n=a.currentTime;o.type=type;o.frequency.setValueAtTime(f,n);
   if(sl)o.frequency.exponentialRampToValueAtTime(Math.max(20,f+sl),n+d);g.gain.setValueAtTime(vol,n);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(g);g.connect(mg);o.start();o.stop(n+d)}catch(e){}}
 function noise(d=.2,vol=.1,f=800){try{const a=AC(),n=a.sampleRate*d,b=a.createBuffer(1,n,a.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;
@@ -146,7 +162,7 @@ function hit(b){
 const GH=[[2300,0],[5200,0],[3600,1]].map(([d,m])=>{const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('class','gh');s.setAttribute('width',22);s.setAttribute('height',22);s.setAttribute('viewBox','0 0 24 24');
   s.innerHTML='<path d="M3 2l17 8-7 2-3 7z" fill="#eee" stroke="#222" stroke-width="1.5"/>';document.body.append(s);return{s,d,m,x:-50,y:-50}});
 const showGh=n=>{ghN=n;GH.forEach((g,i)=>g.s.style.opacity=i<n?.6:0)};
-const showFig=(x,k)=>{if(x==null){fig.style.opacity=0;return}fig.style.left=x+'%';fig.style.setProperty('--k',k);fig.style.opacity=1};
+const showFig=(x,k)=>{if(x==null){fig.style.opacity=0;return}fig.style.left=x+'%';fig.style.setProperty('--k',k);fig.style.setProperty('--dy',((k-1)*14)+'vh');fig.classList.toggle('near',k>=1.5);fig.style.opacity=1};
 const WHISP=["non voltarti","è già qui","sei il prossimo","lui ti vede","non è il narratore","ascolta i passi"];
 setInterval(()=>{if(!document.body.classList.contains('hz')||mode==='off')return;const e=document.createElement('div');e.className='wh';e.textContent=WHISP[Math.floor(Math.random()*WHISP.length)];
   e.style.left=rnd(8,70)+'%';e.style.top=rnd(12,60)+'%';document.body.append(e);noise(.5,.04,900);setTimeout(()=>e.remove(),3300)},9000);
@@ -180,16 +196,23 @@ setInterval(()=>{if(mode==='off'||mode==='final'||mode==='still')return;const n=
     return R(pick('idle'))}},600);
 setInterval(()=>{if(!t0)return;const s=Math.floor((Date.now()-t0)/1000);$('hud').textContent='TEST DI ACCETTAZIONE · TESTER #'+tester+' · '+String(s/60|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0')},1000);
 
+async function card(t){const e=$('card');e.innerHTML=t;e.style.opacity=1;await sleep(3300);e.style.opacity=0;await sleep(1400)}
 /* ===== CAPITOLO 1 · Il Test di Accettazione ===== */
 async function cap1(){
   let n=0;if(db){try{n=(await fb.get(fb.ref(db,'stanza/globale/tentativi'))).val()||0}catch(e){}}
   tester=String(n+1).padStart(4,'0');t0=Date.now();hum(52,.03,4);
-  await sleep(700);
+  await card('CAPITOLO 1<br><small style="letter-spacing:.18em;opacity:.55;font-size:.8em">IL TEST DI ACCETTAZIONE</small>');
+  await sleep(300);
   await say("Benvenuto. Accomodati pure, non c'è fretta.");
   await say("Questo è il Test di Accettazione. Una sola prova, un solo compito.");
   await say("Prima di iniziare devo registrarti. Come ti chiami?",100);
   who=await askName();
   await say("{n}. Bel nome. Lo terrò da parte.");
+  await say("Primo esercizio, per scaldarci: non toccare nulla per cinque secondi.",200);
+  mode='still';let h=0,rb=0,d0=P.d,t1=P.taps;
+  while(h<5000){await sleep(100);if(P.d-d0>30||P.taps>t1){rb++;h=0;d0=P.d;t1=P.taps;say(["Ho detto di non toccare nulla.","Di nuovo. Si vede che ti piace disobbedire.","Va bene. Ricominciamo. Io ho tempo.","Sei un ribelle, {n}. Mi piace. Mi preoccupa un po'."][Math.min(rb-1,3)],300)}else h+=100}
+  mode='off';rebel=rb;
+  await say(rb?"Ce l'hai fatta, dopo "+rb+(rb===1?" errore":" errori")+". Prendo nota.":"Perfetto. Obbedienza assoluta. Prendo nota.");
   if(n>0)await say("Prima di te, qui dentro, ci sono stati "+n+" tentativi.");
   mk(innerWidth/2,innerHeight*.66);
   await say("In fondo alla stanza c'è un bottone rosso. Premilo e il test è concluso.");
@@ -213,8 +236,8 @@ async function cap1(){
   mode='split';await until(()=>c.split>=8);mode='off';
 
   /* --- la svolta --- */
-  document.body.classList.add('hz');bts.slice(1).forEach(b=>b.remove());bts=bts.slice(0,1);place(bts[0],innerWidth/2,innerHeight*.68);hum(38,.06,2);
-  for(let i=0;i<9;i++){veil.style.opacity=i%2?.1:.9;S.glitch();if(i===4)showFig(72,.9);if(i===8)showFig();await sleep(80+Math.random()*130)}
+  document.body.classList.add('hz');$('door').classList.add('open');bts.slice(1).forEach(b=>b.remove());bts=bts.slice(0,1);place(bts[0],innerWidth/2,innerHeight*.68);hum(38,.06,2);
+  for(let i=0;i<9;i++){veil.style.opacity=i%2?.1:.9;S.glitch();if(i===4)showFig(22,.8);if(i===8)showFig();await sleep(80+Math.random()*130)}
   veil.style.opacity='';veil.classList.add('fl');
   await say("…",300,'gl');await say("Aspetta.",300,'gl');
   await say("Hai fatto una cosa che nessun altro aveva fatto: sei ancora qui.",500,'gl');
@@ -238,6 +261,7 @@ async function cap1(){
   await say("Quello era il vero ospite di questa stanza. Io sono solo quello che parla.",600,'gl');
 
   /* confessione */
+  await say(rebel>=2?"Ribelle fino alla fine. Per questo ti ho voluto qui.":"Hai sempre obbedito, fin dal primo esercizio. Anche questo mi spaventa.",600,'gl');
   await say("Ora che siamo soli, posso dirti la verità.",500,'gl');
   await say("Il bottone non apre nessuna porta. Chi lo preme smette di essere il giocatore.",700,'gl');
   setTag('TESTER #0001');
@@ -253,7 +277,7 @@ async function cap1(){
   while(!pressed){await sleep(300);const e=Date.now()-t;if(pressed)break;if(i<W.length&&e>W[i][0])say(W[i++][1],300,'gl');if(e>36000)break}
   if(!pressed)endB();
 }
-async function ending(lines,light){const e=$('end');if(light){e.style.background='#fff';e.style.color='#333'}e.style.display='flex';e.style.opacity=0;e.style.transition='opacity 4s';
+async function ending(lines,light,k){const E=JSON.parse(localStorage.sp_e||'[]');if(!E.includes(k)){E.push(k);localStorage.sp_e=JSON.stringify(E)}lines=[...lines.slice(0,-1),'FINALE «'+k+'» · TROVATI '+E.length+' SU 2',...lines.slice(-1)];const e=$('end');if(light){e.style.background='#fff';e.style.color='#333'}e.style.display='flex';e.style.opacity=0;e.style.transition='opacity 4s';
   requestAnimationFrame(()=>e.style.opacity=1);await sleep(4300);dlg.style.opacity=0;for(const l of lines){$('elog').innerHTML+=l+'<br>';await sleep(1800)}$('ebtn').style.opacity=1}
 async function press(b){
   mode='off';pressed=true;beat(false);b.classList.add('pressed');S.click();setTimeout(S.thud,150);room.classList.add('shake');save({cap1:'premuto',completato:true});await sleep(1000);
@@ -261,7 +285,7 @@ async function press(b){
   await say("Grazie.",800);await say("Dopo tutto questo tempo qualcuno lo ha premuto. Ora posso tacere.",900);await say("Il rumore del click. Era proprio così.",1300);
   setTag('SISTEMA');await say("ESITO: ACCETTATO. RUOLO ASSEGNATO: NARRATORE.",900);
   /* finale: ora il narratore sei tu */
-  document.body.classList.remove('hz');room.classList.remove('shake');veil.style.transition='opacity 3s';veil.style.opacity=0;
+  document.body.classList.remove('hz');$('door').classList.remove('open');room.classList.remove('shake');veil.style.transition='opacity 3s';veil.style.opacity=0;
   bts.forEach(x=>x.remove());bts=[];const nb=mk(innerWidth/2,innerHeight*.68);hum(55,.025,3);
   await sleep(2500);await say("Si accende una luce. La stanza è di nuovo bianca. Qualcuno è appena entrato.",700);
   GH[0].x=innerWidth*.15;GH[0].y=innerHeight*.45;tg={x:innerWidth*.2,y:innerHeight*.5};showGh(1);GH[0].s.style.opacity=1;
@@ -278,14 +302,20 @@ async function press(b){
   if(i3===1){nb.classList.add('pressed');S.click();await say("Click. Troppo facile. Non succede niente. Forse.",800)}
   if(i3===2){const q=mk(nb._x,nb._y);setTimeout(()=>place(q,innerWidth*.2,innerHeight*.8),50);S.whoosh();await say("Ora sono due. Uno è quello vero. Forse.",800)}
   await say("La voce, adesso, è la tua.",900);
-  ending(["Dall'altra parte, qualcuno ti sta ascoltando.","Ricordi come si comincia?","","Benvenuto. Accomodati pure, non c'è fretta.","","FINE CAPITOLO 1 · IL TEST DI ACCETTAZIONE"],true);
+  ending(["Dall'altra parte, qualcuno ti sta ascoltando.","Ricordi come si comincia?","","Benvenuto. Accomodati pure, non c'è fretta.","","FINE CAPITOLO 1 · IL TEST DI ACCETTAZIONE"],true,'Il Rimpiazzo');
 }
 async function endB(){
   mode='off';beat(false);save({cap1:'atteso',completato:true});bts[0].style.opacity=0;veil.classList.remove('fl');veil.style.transition='none';veil.style.opacity=1;showGh(0);hum(30,0,3);
   await say("Grazie. Resta.",1400);
-  ending(["ESITO: NESSUNO","Il test non è mai finito.","TESTER #"+tester+" · SESSIONE IN CORSO","","FINE CAPITOLO 1 · IL TEST DI ACCETTAZIONE"]);
+  ending(["ESITO: NESSUNO","Il test non è mai finito.","TESTER #"+tester+" · SESSIONE IN CORSO","","FINE CAPITOLO 1 · IL TEST DI ACCETTAZIONE"],false,'La Compagnia');
 }
-$('go').onclick=async()=>{$('start').style.display='none';AC();S.ok();await initFB();presence();cap1()};
+const mq=$('mq'),mn=$('mn'),MQ=["Non hai ancora iniziato e già mi fai aspettare.","Il bottone è lì, a destra. Fa finta di niente.","Puoi restare nel menù quanto vuoi. Io ho tempo. Troppo.","Tutti iniziano. Pochissimi finiscono. Nessuno ricorda come.","Se senti dei passi, è la ventilazione. Probabilmente."];let mqi=0;
+const mqs=()=>{mq.style.opacity=0;setTimeout(()=>{mq.textContent=MQ[mqi++%MQ.length];mq.style.opacity=1},500)};mqs();const mqt=setInterval(mqs,7000);
+mk(innerWidth*.74,innerHeight*.7);
+const begin=async()=>{clearInterval(mqt);$('start').style.display='none';bts.forEach(b=>b.remove());bts=[];AC();S.ok();await initFB();presence();cap1()};
+function menu(){mn.innerHTML='<a id="go">Inizia il test</a><a id="chs">Capitoli</a><a id="snd">Audio: '+(muted?'spento':'attivo')+'</a>';$('go').onclick=begin;$('chs').onclick=chap;$('snd').onclick=()=>{muted=!muted;if(mg)mg.gain.value=muted?0:1;menu()}}
+function chap(){mn.innerHTML='<a id="c1">Capitolo 1 · Il Test di Accettazione</a><a class="lk">Capitolo 2 · in arrivo</a><a id="bk">← Indietro</a>';$('c1').onclick=begin;$('bk').onclick=menu}
+menu();
 </script>
 </body>
 </html>
