@@ -38,7 +38,7 @@ Quindi la protezione vera si fa **sul server (Firebase)**, mentre la pagina si l
 ```bash
 npm install
 npm run build          # crea dist/index.html offuscato
-cd dist && zip -r ../bottone-rosso.zip index.html
+cd dist && zip -r ../bottone-rosso.zip .
 ```
 Su itch.io: *Kind of project* → **HTML**, carica lo zip, spunta *This file will be played in the browser*,
 abilita **Mobile friendly** e **Fullscreen button**.

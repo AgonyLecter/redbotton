@@ -1,0 +1,10 @@
+{
+  "name": "Il Bottone Rosso",
+  "short_name": "Bottone Rosso",
+  "lang": "it",
+  "start_url": "./",
+  "display": "fullscreen",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

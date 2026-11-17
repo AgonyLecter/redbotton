@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com https://*.firebasedatabase.app https://*.firebaseio.com https://www.google.com https://www.recaptcha.net; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; frame-src https://www.google.com https://www.recaptcha.net https://*.firebaseapp.com; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Il Bottone Rosso">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Cellipse cx='32' cy='44' rx='22' ry='8' fill='%23222'/%3E%3Cpath d='M14 40c0-14 36-14 36 0z' fill='%23e00'/%3E%3C/svg%3E">
 <title>Test di Accettazione</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;outline:none}
@@ -47,6 +54,11 @@ body.hz #tag:before{background:#e33}
 .big{font:inherit;font-size:1.05rem;padding:12px 28px;border:2px solid currentColor;background:none;color:inherit;border-radius:8px;cursor:pointer}
 #end{display:none;background:#000;color:#9fd;font:14px/1.9 ui-monospace,monospace;z-index:40}
 #ebtn{opacity:0;transition:opacity 1s;color:inherit;font-family:inherit}
+#boot{position:fixed;inset:0;z-index:70;background:#000;color:#bbb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center;padding:24px;cursor:pointer;transition:opacity 1.6s;font:13px/2 ui-monospace,monospace;letter-spacing:.25em}
+#boot b{display:block;width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 40% 32%,#ff7a7a,#d00 52%,#4a0000);box-shadow:0 0 30px rgba(255,0,0,.45);animation:bpul 2.4s ease-in-out infinite}
+@keyframes bpul{50%{box-shadow:0 0 60px rgba(255,0,0,.8);transform:scale(1.06)}}
+#boot u{text-decoration:none;color:#fff;font-size:14px;animation:bl 1.6s infinite}#boot i{font-style:normal;opacity:.55;font-size:11px}
+#mn a{position:relative}#mn a:not(.lk):hover:before{content:"";position:absolute;left:-14px;top:50%;width:7px;height:7px;margin-top:-3px;border-radius:50%;background:#c00}
 #coach{position:fixed;left:50%;top:calc(34px + env(safe-area-inset-top));transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:9px 16px 9px 10px;border-radius:30px;background:rgba(0,0,0,.66);border:1px solid rgba(255,255,255,.25);color:#fff;font:600 12px/1.35 system-ui,sans-serif;letter-spacing:.08em;z-index:22;opacity:0;transition:opacity .4s;pointer-events:none;width:max-content;max-width:calc(100vw - 24px)}
 #coach.on{opacity:1;animation:cpul 2.2s infinite}@keyframes cpul{50%{box-shadow:0 0 0 4px rgba(255,255,255,.12)}}
 #cico{position:relative;width:48px;height:30px;flex:none}
@@ -72,6 +84,7 @@ body.hz #tag:before{background:#e33}
 </style>
 </head>
 <body>
+<div id="boot"><b></b><div>IL BOTTONE ROSSO</div><i>CUFFIE · VOLUME ALTO · LUCI SPENTE</i><u id="bootT">TOCCA PER ENTRARE</u></div>
 <div id="room"></div>
 <div id="veil"></div>
 <canvas id="fx"></canvas><div id="cue"></div><div id="rec"></div><div id="hud"></div><div id="card"></div>
@@ -90,7 +103,7 @@ body.hz #tag:before{background:#e33}
 
 <script type="module">
 const THREE=await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js').catch(()=>null);
-if(!THREE){document.getElementById('mq').textContent='Impossibile caricare il motore 3D. Controlla la connessione e ricarica la pagina.';throw new Error('three.js non caricato')}
+if(!THREE){const bt=document.getElementById('boot');bt&&bt.remove();document.getElementById('mq').textContent='Impossibile caricare il motore 3D. Controlla la connessione e ricarica la pagina.';throw new Error('three.js non caricato')}
 
 const FB={apiKey:"AIzaSyAkUVXKvb98udD0cy_Cllay3VECK-AoRtc",authDomain:"wandernaturelogin.firebaseapp.com",
 databaseURL:"https://wandernaturelogin-default-rtdb.europe-west1.firebasedatabase.app",projectId:"wandernaturelogin",
@@ -99,6 +112,14 @@ storageBucket:"wandernaturelogin.firebasestorage.app",messagingSenderId:"3479339
 const APPCHECK_KEY="";
 
 const $=i=>document.getElementById(i),room=$('room'),txt=$('txt'),dlg=$('dlg'),tag=$('tag'),veil=$('veil');
+/* ===== Schermo intero: i browser lo concedono solo dopo un tocco o un clic, quindi lo chiediamo al primo tocco
+   e di nuovo a ogni tocco se il giocatore ne esce (il gioco non ti lascia andare). iPhone non lo supporta: lì si usa «Aggiungi a Home». */
+let fsOK=0,fsWarn=0;const FSE=()=>document.fullscreenElement||document.webkitFullscreenElement;
+const grabFS=()=>{try{const el=document.documentElement,f=el.requestFullscreen||el.webkitRequestFullscreen;if(FSE()||!f)return Promise.resolve(0);
+  const r=f.call(el,{navigationUI:'hide'});return Promise.resolve(r).then(()=>{fsOK=1;return 1}).catch(()=>0)}catch(e){return Promise.resolve(0)}};
+addEventListener('pointerup',()=>{if(!FSE())grabFS()},true);addEventListener('keydown',e=>{if(!FSE()&&e.key!=='Escape'&&e.key!=='F11')grabFS()},true);
+const onFS=()=>{if(!FSE()&&fsOK&&typeof t0!=='undefined'&&t0&&!fsWarn){fsWarn=1;setTimeout(()=>fsWarn=0,20000);say("Hai tolto lo schermo intero. Al prossimo tocco me lo riprendo. La stanza non è nello schermo, {n}: è dietro.",300,'gl')}};
+document.addEventListener('fullscreenchange',onFS);document.addEventListener('webkitfullscreenchange',onFS);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),rnd=(a,b)=>a+Math.random()*(b-a);
 const T=matchMedia('(pointer:coarse)').matches,v=(m,t)=>T?t:m;
 const uid=localStorage.sp_uid||(localStorage.sp_uid=Math.random().toString(36).slice(2,10));
@@ -168,7 +189,7 @@ function choose(opts){return new Promise(r=>{const d=document.createElement('div
   dlg.append(d);dlg.style.pointerEvents='auto'})}
 function askName(){return new Promise(r=>{const d=document.createElement('div');d.id='ch';d.innerHTML='<input id="nm" maxlength="14" placeholder="Scrivi il tuo nome" autocomplete="off"><button class="opt">Conferma</button>';
   dlg.append(d);dlg.style.pointerEvents='auto';const go=()=>{const x=$('nm').value.trim()||'Tester';d.remove();dlg.style.pointerEvents='';r(x)};
-  d.lastChild.onclick=go;$('nm').onkeydown=e=>e.key==='Enter'&&go();setTimeout(()=>$('nm').focus(),150)})}
+  d.lastChild.onclick=go;$('nm').onkeydown=e=>e.key==='Enter'&&go();setTimeout(()=>{const x=$('nm');x&&x.focus()},150)})}
 
 const L={
  dodge:["Oh. Un piccolo errore di calibrazione. Capita. Riprova.","Strano. Di solito è docile.","Non preoccuparti: è un problema loro, non tuo.","Loro chi? Nessuno. Era un modo di dire.","Continua pure, {n}. Stai andando benissimo.","Sei più ostinato degli ultimi tester."],
@@ -485,7 +506,7 @@ setInterval(()=>{if(!t0)return;const s=Math.floor((Date.now()-t0)/1000);$('hud')
 /* ===== Interazioni extra: testo libero, messaggi nascosti alla torcia, tieni premuto ===== */
 const Q={del:0,ms:0};let leaves=0;document.addEventListener('visibilitychange',()=>{if(document.hidden&&t0)leaves++});
 const askT=(ph,mx=60)=>new Promise(r=>{const d=document.createElement('div');d.id='ch';d.innerHTML='<input id="nm" maxlength="'+mx+'" placeholder="'+ph+'" autocomplete="off"><button class="opt">Conferma</button>';dlg.append(d);dlg.style.pointerEvents='auto';
-  const t1=Date.now();let del=0;$('nm').addEventListener('input',e=>{if(/delete/.test(e.inputType))del++});const go=()=>{const x=$('nm').value.trim();Q.del=del;Q.ms=Date.now()-t1;d.remove();dlg.style.pointerEvents='';r(x)};d.lastChild.onclick=go;$('nm').onkeydown=e=>e.key==='Enter'&&go();setTimeout(()=>$('nm').focus(),150)});
+  const t1=Date.now();let del=0;$('nm').addEventListener('input',e=>{if(/delete/.test(e.inputType))del++});const go=()=>{const x=$('nm').value.trim();Q.del=del;Q.ms=Date.now()-t1;d.remove();dlg.style.pointerEvents='';r(x)};d.lastChild.onclick=go;$('nm').onkeydown=e=>e.key==='Enter'&&go();setTimeout(()=>{const x=$('nm');x&&x.focus()},150)});
 async function hidden(arr){const N=arr.length;let fd=0;
   const els=arr.map((t,i)=>{const row=Math.floor(i/2)%3,sx=innerWidth*((i%2?68:26)+rnd(-5,5))/100,sy=innerHeight*(15+row*11+rnd(0,4))/100;
     const h=rayShell(sx,sy);let p,nrm,dist=12,sq=1;
@@ -852,8 +873,6 @@ async function cap3(){
 /* ===== CAPITOLO 4 · L'Uscita =====
    Il narratore è tornato e racconta in terza persona quello che fai DAVVERO, mentre lo fai.
    Il gioco finge di finire, finge un menù, finge di chiudersi. Poi ti chiede di andartene sul serio. */
-let fsOK=0;document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&fsOK&&t0){fsOK=0;say("Hai tolto lo schermo intero. Non cambia niente: la stanza non è nello schermo.",300,'gl')}});
-const grabFS=()=>{try{const el=document.documentElement;if(!document.fullscreenElement&&el.requestFullscreen)return el.requestFullscreen().then(()=>{fsOK=1;return 1}).catch(()=>0)}catch(e){}return Promise.resolve(0)};
 async function narrateLive(ms){const t1=Date.now();let lx=P.mx,ly=P.my,lt=P.taps,ll=leaves,lastL=0,saidT=0;const said=new Set();
   const once=(k,t)=>{if(said.has(k))return null;said.add(k);return t};
   coach('drag','FAI QUELLO CHE VUOI · LUI LO RACCONTA');
@@ -903,7 +922,7 @@ async function cap4(){
   if(c===0)await say("{n} scelse «Sinistra», esattamente come era scritto. Non ti senti un po' meno libero, adesso?",800);
   else{await redo("{n} scelse «Destra».","No. Rileggi meglio.");await say("Adesso {n} sceglierà «Sinistra».",100);
     c=await choose(["Sinistra","Sinistra"]);await say("{n} scelse «Sinistra». Vedi quanto è facile? Mi basta riscrivere le opzioni. Le tue scelte sono solo bottoni che preparo io.",900)}
-  const fs=await grabFS();if(fs)await say("Ah, e intanto mi sono preso tutto lo schermo. Non te ne sei accorto, vero? Era nascosto nel tuo ultimo tocco.",700);
+  if(FSE())await say("Hai notato che lo schermo è tutto mio dal tuo primo tocco? Non te l'ho mai chiesto. Non chiedo mai.",700);
   await say("Va bene. Hai vinto tu. Ti lascio andare. Davvero.",1400);
   dlg.style.opacity=0;await sleep(800);const close=await credits(who);
   await say("…",900,'gl');await say("Ci hai creduto, vero? Per un secondo. Lo sento quando ci credete: il dito si stacca dallo schermo.",900,'gl');close();await sleep(2400);
@@ -988,6 +1007,7 @@ async function endB(){
 }
 const mq=$('mq'),mn=$('mn'),MQ=["Non hai ancora iniziato e già mi fai aspettare.","Il bottone è lì, a destra. Fa finta di niente.","Puoi restare nel menù quanto vuoi. Io ho tempo. Troppo.","Tutti iniziano. Pochissimi finiscono. Nessuno ricorda come.","Se senti dei passi, è la ventilazione. Probabilmente."];let mqi=0;if(vis>0&&last)MQ.unshift('L\'ultima volta sei andato via '+ago()+' fa. Non ti ho dimenticato.');if(JSON.parse(localStorage.sp_e||'[]').length)MQ.push('So come sei finito l\'ultima volta. Tu lo ricordi?');
 const HOME=localStorage.sp_home==='1';if(HOME){MQ.length=0;MQ.push('Bentornato a casa, '+(localStorage.sp_name||'tester')+'.','La tua stanza è come l\'hai lasciata.','Lui ha tenuto il tuo posto.','Non c\'è fretta. Non c\'è mai stata.');const h1=document.querySelector('#mt h1');h1.textContent=(localStorage.sp_name||'TESTER').toUpperCase();document.querySelector('#mt small').textContent='CASA'}
+const IOS=/iPhone|iPod/.test(UA)&&!navigator.standalone&&window.self===window.top;if(IOS)MQ.splice(1,0,'Su iPhone lo schermo intero non esiste: tocca Condividi → «Aggiungi alla schermata Home» e aprimi da lì.');
 const mqs=()=>{mq.style.opacity=0;setTimeout(()=>{mq.textContent=MQ[mqi++%MQ.length];mq.style.opacity=1},500)};mqs();const mqt=setInterval(mqs,7000);
 mk(innerWidth*.74,innerHeight*.7);
 const T0=document.title;document.addEventListener('visibilitychange',()=>{document.title=document.hidden&&t0?['Dove vai?','Torna qui.',who+'...','Ti aspetto.'][Math.floor(Math.random()*4)]:T0});
@@ -1002,6 +1022,11 @@ const CHS=[['Capitolo 1 · Il Test di Accettazione',()=>1,()=>cap1,''],["Capitol
 function chap(){mn.innerHTML=CHS.map(([t,u,f,h],i)=>u()?'<a data-c="'+i+'">'+t+'</a>':'<a class="lk">'+t.split(' · ')[0]+' · '+h+'</a>').join('')+'<a id="bk">← Indietro</a>';
   mn.querySelectorAll('a[data-c]').forEach(a=>a.onclick=()=>begin(CHS[+a.dataset.c][2]()));$('bk').onclick=menu}
 menu();
+/* schermata d'ingresso: il primo tocco attiva schermo intero e audio */
+{const B=$('boot');if(!T)$('bootT').textContent='CLICCA PER ENTRARE';let gone=0;
+  const enter=()=>{if(gone)return;gone=1;grabFS();try{AC();ac.resume&&ac.resume()}catch(e){}hum(52,.02,3);noise(1.2,.05,400);B.style.opacity=0;B.style.pointerEvents='none';setTimeout(()=>B.remove(),1700)};
+  B.addEventListener('click',enter);addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')enter()})}
+mn.addEventListener('pointerover',e=>{if(e.target.closest('a:not(.lk)'))S.tick()});
 </script>
 </body>
 </html>

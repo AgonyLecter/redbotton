@@ -1,6 +1,6 @@
 // Crea dist/index.html: la stessa pagina, ma con il codice del gioco offuscato.
 // Uso:  npm install  &&  npm run build   → carica dist/index.html (o lo zip) su itch.io
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from 'node:fs';
 import JavaScriptObfuscator from 'javascript-obfuscator';
 
 const src = readFileSync('index.html', 'utf8');
@@ -34,4 +34,5 @@ const html = src.slice(0, a + OPEN.length) + '\n' + out + '\n' + src.slice(b)
   .replace(/\n\s*\n/g, '\n');
 mkdirSync('dist', { recursive: true });
 writeFileSync('dist/index.html', html);
+for (const f of ['manifest.webmanifest', 'icon.svg']) copyFileSync(f, 'dist/' + f);
 console.log('dist/index.html creato (' + Math.round(html.length / 1024) + ' KB)');
