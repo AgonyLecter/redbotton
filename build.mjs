@@ -34,5 +34,6 @@ const html = src.slice(0, a + OPEN.length) + '\n' + out + '\n' + src.slice(b)
   .replace(/\n\s*\n/g, '\n');
 mkdirSync('dist', { recursive: true });
 writeFileSync('dist/index.html', html);
-for (const f of ['manifest.webmanifest', 'icon.svg']) copyFileSync(f, 'dist/' + f);
+mkdirSync('dist/icons', { recursive: true });
+for (const f of ['manifest.webmanifest', 'icon.svg', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png']) copyFileSync(f, 'dist/' + f);
 console.log('dist/index.html creato (' + Math.round(html.length / 1024) + ' KB)');
