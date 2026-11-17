@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>La Stanza Bianca</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:#222;font-family:Georgia,serif;overflow:hidden;touch-action:manipulation;user-select:none}
+#room{position:fixed;inset:0}
+.btn{position:absolute;width:92px;height:92px;border-radius:50%;transform:translate(-50%,-50%);cursor:pointer;
+background:radial-gradient(circle at 35% 30%,#ff7a7a,#d10000 70%);border:6px solid #8f0000;box-shadow:0 8px 0 #6e0000;
+transition:left .28s cubic-bezier(.3,1.6,.5,1),top .28s cubic-bezier(.3,1.6,.5,1),transform .12s,box-shadow .12s;animation:pop .3s}
+.btn.pressed{transform:translate(-50%,calc(-50% + 8px));box-shadow:0 0 0 #6e0000;cursor:default}
+@keyframes pop{from{opacity:0;scale:.2}to{opacity:1;scale:1}}
+.ghost{position:absolute;width:10px;height:10px;border-radius:50%;background:#c8c8c8;transform:translate(-50%,-50%);pointer-events:none}
+#ghosts{position:fixed;inset:0;pointer-events:none}
+#sub{position:fixed;left:50%;bottom:9%;transform:translateX(-50%);width:min(720px,90vw);text-align:center;font-size:clamp(1.05rem,3.6vw,1.45rem);
+line-height:1.45;min-height:3em;opacity:0;transition:opacity .4s;pointer-events:none}
+#sub.on{opacity:1}
+#hud{position:fixed;top:10px;right:12px;font:13px system-ui,sans-serif;color:#999;display:flex;gap:10px;align-items:center}
+#hud button{background:none;border:1px solid #ddd;border-radius:8px;padding:4px 8px;cursor:pointer;color:#666}
+.ov{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;z-index:5}
+.ov h1{font-weight:400;letter-spacing:.12em;margin:0;font-size:clamp(1.6rem,6vw,2.4rem)}
+.ov p{margin:0;color:#777;max-width:420px}
+.ov button.big{font:inherit;font-size:1.1rem;padding:12px 26px;border:2px solid #222;background:#fff;border-radius:6px;cursor:pointer}
+.ov button.big:disabled{border-color:#ddd;color:#bbb;cursor:default}
+#end{display:none}
+</style>
+</head>
+<body>
+<div id="room"></div>
+<div id="ghosts"></div>
+<div id="sub"></div>
+<div id="hud"><span id="cnt"></span><button id="vbtn">🔇 Voce</button></div>
+
+<div class="ov" id="start">
+  <h1>LA STANZA BIANCA</h1>
+  <p>C'è una stanza. C'è un bottone rosso. Ti basta premerlo.</p>
+  <button class="big" id="go">Capitolo 1 · La Stanza Bianca</button>
+  <button class="big" disabled>Capitolo 2 · 🔒 in arrivo</button>
+  <p style="font-size:.85rem">Consigliato: audio attivo. Il narratore può parlare (tasto Voce in alto a destra).</p>
+</div>
+<div class="ov" id="end">
+  <h1>FINE CAPITOLO 1</h1>
+  <p>Il bottone non era quello vero. Il capitolo 2 arriverà presto.</p>
+  <button class="big" onclick="location.reload()">Rigioca</button>
+</div>
+
+<script type="module">
+/* ====== CONFIG FIREBASE: incolla qui i dati del tuo progetto ====== */
+const FB={apiKey:"AIzaSyAkUVXKvb98udD0cy_Cllay3VECK-AoRtc",authDomain:"wandernaturelogin.firebaseapp.com",
+databaseURL:"https://wandernaturelogin-default-rtdb.europe-west1.firebasedatabase.app",projectId:"wandernaturelogin",
+storageBucket:"wandernaturelogin.firebasestorage.app",messagingSenderId:"347933923936",appId:"1:347933923936:web:cc34ca02d7247970ff8105"};
+/* Senza config il gioco funziona lo stesso, solo offline. */
+
+const $=id=>document.getElementById(id), room=$('room'), sub=$('sub');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms)), rnd=(a,b)=>a+Math.random()*(b-a);
+const uid=localStorage.sp_uid||(localStorage.sp_uid=Math.random().toString(36).slice(2,10));
+let db=null, fb={}, mode='off', bts=[], c={dodge:0,tele:0,split:0,all:0}, lastAct=Date.now(), voiceOn=false, tok=0, ac;
+
+/* ---------- Firebase ---------- */
+async function initFB(){
+  if(FB.apiKey.startsWith('INSERISCI'))return;
+  try{
+    const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    fb=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+    db=fb.getDatabase(A.initializeApp(FB));
+  }catch(e){console.warn('Firebase non disponibile',e);db=null}
+}
+const save=o=>db&&fb.update(fb.ref(db,'stanza/giocatori/'+uid),{...o,t:Date.now()}).catch(()=>{});
+function presence(){
+  if(!db)return;
+  const r=fb.ref(db,'stanza/cursori/'+uid); fb.onDisconnect(r).remove(); let last=0;
+  addEventListener('pointermove',e=>{const n=Date.now(); if(n-last<200)return; last=n;
+    fb.set(r,{x:e.clientX/innerWidth,y:e.clientY/innerHeight,t:n}).catch(()=>{});});
+  fb.onValue(fb.ref(db,'stanza/cursori'),s=>{
+    const g=$('ghosts'); g.innerHTML='';
+    Object.entries(s.val()||{}).forEach(([k,p])=>{
+      if(k===uid||Date.now()-p.t>8000)return;
+      const d=document.createElement('i'); d.className='ghost'; d.style.left=p.x*100+'%'; d.style.top=p.y*100+'%'; g.append(d);});
+  });
+}
+function attempt(){
+  lastAct=Date.now(); $('cnt').textContent='Tentativi: '+c.all;
+  if(db){fb.runTransaction(fb.ref(db,'stanza/globale/tentativi'),v=>(v||0)+1).catch(()=>{}); save({cap:1,tentativi:c.all});}
+}
+
+/* ---------- Audio e narratore ---------- */
+function beep(f=440,d=.08,type='sine'){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();
+  o.type=type;o.frequency.value=f;g.gain.value=.07;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function say(t,hold=1300){
+  const my=++tok; sub.classList.add('on'); sub.textContent='';
+  if(voiceOn&&window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='it-IT';u.rate=.95;speechSynthesis.speak(u)}
+  return new Promise(res=>{let i=0;(function tick(){
+    if(my!==tok)return res();
+    sub.textContent=t.slice(0,++i);
+    if(i<t.length)setTimeout(tick,28); else setTimeout(res,hold+t.length*18);
+  })()});
+}
+const until=fn=>new Promise(res=>{const i=setInterval(()=>{if(fn()){clearInterval(i);res()}},100)});
+
+/* ---------- Bottoni ---------- */
+const rndPos=()=>[rnd(70,innerWidth-70),rnd(80,innerHeight-170)];
+function place(b,x,y){b.style.left=x+'px';b.style.top=y+'px';b._x=x;b._y=y}
+function mk(x,y){const b=document.createElement('div');b.className='btn';room.append(b);place(b,x,y);
+  b.addEventListener('pointerdown',e=>{e.preventDefault();hit(b)});bts.push(b);return b}
+function react(k,L){c[k]++;c.all++;attempt();const l=L[c[k]-1];if(l)say(l);beep(260+c[k]*55,.07)}
+
+const L={
+ dodge:["Il giocatore si avvicinò al bottone. Il bottone, con grande professionalità, si spostò.",
+  "Un piccolo malinteso. Riprova, nessuno ti giudica. Io un po' sì.",
+  "Il narratore non ha nulla a che fare con questo. Assolutamente nulla.",
+  "Mi dicono che il bottone sia «in manutenzione». Lo trovo credibile.",
+  "Potresti provare a non muoverti. Non funzionerà, ma sarebbe elegante.",
+  "Sei molto determinato. Il bottone lo sa. Ha paura."],
+ tele:["Ah! Questa volta lo hai cliccato. Peccato che il bottone abbia deciso di non essere più lì.",
+  "Un classico del teletrasporto. Non è un bug, è una feature.",
+  "In una versione precedente di questo gioco bastava premere. Era noiosissimo.",
+  "Potrei aiutarti. Ma non voglio.",
+  "Senti, ormai ci siamo affezionati a questa dinamica."],
+ split:["Oh no. Si è sdoppiato. Che imprevisto. Chi poteva immaginarlo.",
+  "Adesso sono tre. Uno di questi è quello vero. Forse.",
+  "Il giocatore pensò: più bottoni, più probabilità. La matematica è dalla sua parte. Il resto no.",
+  "Quattro. Cinque. Sto perdendo il conto, e io sono il narratore.",
+  "Questo non era previsto nemmeno nel copione. Il copione sono io.",
+  "Ancora un paio e li chiamo «popolazione».",
+  "Ultimo clic. Lo sento."]
+};
+const IDLE=["Sei ancora lì? Il bottone non si preme da solo.",
+ "Posso aspettare. Ho tutto il tempo del mondo: sono un narratore.",
+ "Il giocatore rimase immobile. Evidentemente aveva un piano. Non lo aveva.",
+ "Se stai cercando un'uscita, qui non ce n'è. Ho controllato."];
+
+function flee(b,px,py){
+  b._t=Date.now(); let p=rndPos();
+  for(let i=0;i<25&&Math.hypot(p[0]-px,p[1]-py)<260;i++)p=rndPos();
+  place(b,...p); react('dodge',L.dodge);
+}
+function hit(b){
+  lastAct=Date.now();
+  if(mode==='dodge')return flee(b,b._x,b._y);
+  if(mode==='tele'){place(b,...rndPos());react('tele',L.tele)}
+  else if(mode==='split'){
+    if(bts.length<8){const q=mk(b._x,b._y);setTimeout(()=>place(q,...rndPos()),30)}
+    place(b,...rndPos());react('split',L.split)}
+  else if(mode==='final')press(b);
+}
+addEventListener('pointermove',e=>{
+  lastAct=Date.now(); if(mode!=='dodge')return;
+  for(const b of bts)if(Math.hypot(b._x-e.clientX,b._y-e.clientY)<115&&Date.now()-(b._t||0)>500)flee(b,e.clientX,e.clientY);
+});
+setInterval(()=>{ if(mode==='off'||Date.now()-lastAct<10000)return; lastAct=Date.now(); say(IDLE[Math.floor(Math.random()*IDLE.length)]); },1000);
+
+/* ---------- CAPITOLO 1 ---------- */
+async function cap1(){
+  await sleep(900);
+  await say("Questa è una stanza bianca. Non c'è niente qui. Quasi niente.");
+  let n=0;
+  if(db){try{n=(await fb.get(fb.ref(db,'stanza/globale/tentativi'))).val()||0}catch(e){}}
+  await say("Al centro c'è un bottone rosso. Il giocatore lo premette e fu felice. Fine della storia.");
+  if(n>0)await say("Prima di te, in questa stanza, sono stati fatti "+n+" tentativi. Nessuno ha il mio rispetto.");
+  mk(innerWidth/2,innerHeight/2-40);
+  await say("Dai, premilo. È lì davanti a te.");
+  mode='dodge'; await until(()=>c.dodge>=6); mode='off';
+
+  await say("Va bene, il bottone è timido. Cambiamo approccio: adesso non scappa. Si limita a non farsi premere.");
+  mode='tele'; await until(()=>c.tele>=5); mode='off';
+
+  await say("Basta teletrasporti. Il bottone ha un'idea migliore: moltiplicarsi.");
+  mode='split'; await until(()=>c.split>=8); mode='off';
+
+  bts.slice(1).forEach(b=>b.remove()); bts=bts.slice(0,1); place(bts[0],innerWidth/2,innerHeight/2-40);
+  await say("Ok. Mi arrendo. Ho finito le idee e la pazienza del bottone.");
+  await say("Eccolo. Fermo. Al centro. Premilo, prima che cambi idea.",500);
+  mode='final';
+}
+async function press(b){
+  mode='off'; b.classList.add('pressed'); beep(90,.4,'square'); save({cap1:'premuto'});
+  await sleep(2200);
+  await say("Click.");
+  await say("Complimenti. Hai premuto un bottone.");
+  await say("Non è successo niente, vero? Forse perché questo era un bottone finto.");
+  await say("Quello vero è più in basso. Molto più in basso. Ne parleremo nel prossimo capitolo.",1800);
+  save({cap:1,completato:true}); $('end').style.display='flex';
+}
+
+/* ---------- Avvio ---------- */
+$('vbtn').onclick=()=>{voiceOn=!voiceOn;$('vbtn').textContent=voiceOn?'🔊 Voce':'🔇 Voce';if(!voiceOn&&window.speechSynthesis)speechSynthesis.cancel()};
+$('go').onclick=async()=>{
+  $('start').style.display='none'; beep(200,.05);
+  await initFB(); presence(); cap1();
+};
+</script>
+</body>
+</html>
